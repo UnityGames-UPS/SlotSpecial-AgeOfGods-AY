@@ -14,12 +14,13 @@ public static class SocketModel
 
   public static int currentBetIndex = 0;
 
-  //     internal SocketModel(){
-  //     this.playerData= new PlayerData();
-  //     this.uIData= new UIData();
-  //     this.initGameData= new InitGameData();
-  //     this.resultGameData= new ResultGameData();
-  // }
+    //   internal SocketModel()
+    // {
+    //   this.playerData= new PlayerData();
+    //   this.uIData= new UIData();
+    //   this.initGameData= new InitGameData();
+    //   this.resultGameData= new ResultGameData();
+    // }
 
 }
 

@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
         uIManager.OnExit = () => socketController.CloseSocket();
         socketController.ShowDisconnectionPopup = uIManager.DisconnectionPopup;
 
-        socketController.OpenSocket();
+        //socketController.OpenSocket();
 
         // StopSpin_Button.onClick.AddListener(() => StartCoroutine(StopSpin()));
         // Turbo_Button.onClick.AddListener(ToggleTurboMode);
