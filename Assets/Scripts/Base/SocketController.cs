@@ -428,6 +428,10 @@ public class SocketController : MonoBehaviour
         public Features features { get; set; }
         public UiData uiData { get; set; }
         public Player player { get; set; }
+        public bool success { get; set; }
+        public List<List<string>> matrix { get; set; }
+  
+        public Payload payload { get; set; }
     }
 
     [Serializable]
@@ -467,6 +471,28 @@ public class Data
   public string socketURL;
   public string nameSpace;
 }
+
+// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+
+    public class GoldenPositions
+    {
+    }
+
+    public class Payload
+    {
+        public double winAmount { get; set; }
+        public List<object> lineWins { get; set; }
+        public GoldenPositions goldenPositions { get; set; }
+        public List<object> levelUpResponse { get; set; }
+        public List<object> wildPositions { get; set; }
+        public int activeLines { get; set; }
+        public int freeSpinsRemaining { get; set; }
+        public bool isFreeSpinActive { get; set; }
+        public int wildFeaturePending { get; set; }
+    
+    }
+
+
 
 
 }
