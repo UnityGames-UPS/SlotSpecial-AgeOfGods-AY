@@ -67,21 +67,21 @@ public class SlotController : MonoBehaviour
         // yield return new WaitForSeconds(0.2f);
     }
 
-    internal void PopulateSLotMatrix(List<List<int>> resultData,List<List<int>> goldPositions)
+    internal void PopulateSLotMatrix(List<List<string>> resultData) //, List<List<int>> goldPositions
     {
 
         for (int i = 0; i <resultData.Count; i++)
         {
             for (int j = 0; j < resultData[i].Count; j++)
             {
-                slotMatrix[j].slotImages[i].SetIcon(ID:resultData[i][j] ,image:iconImages[resultData[i][j]] );
+                slotMatrix[j].slotImages[i].SetIcon(ID:int.Parse(resultData[i][j]) ,image:iconImages[int.Parse(resultData[i][j])] );
             }
         }
-        for (int i = 0; i < goldPositions.Count; i++)
-        {   
-            int id=slotMatrix[goldPositions[i][1]].slotImages[goldPositions[i][0]].id;
-            slotMatrix[goldPositions[i][1]].slotImages[goldPositions[i][0]].SetGoldIcon(goldIconImages[id]);
-        }
+        // for (int i = 0; i < goldPositions.Count; i++)
+        // {   
+        //     int id=slotMatrix[goldPositions[i][1]].slotImages[goldPositions[i][0]].id;
+        //     slotMatrix[goldPositions[i][1]].slotImages[goldPositions[i][0]].SetGoldIcon(goldIconImages[id]);
+        // }
     }
     internal IEnumerator StopSpin(bool turboMode,Action playFallAudio)
     {
