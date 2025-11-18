@@ -123,14 +123,14 @@ public class GameManager : MonoBehaviour
             if (currentBalance < currentTotalBet)
             uIManager.LowBalPopup();
 
-            uIManager.UpdatePlayerInfo(SocketModel.playerData);
-            uIManager.PopulateSymbolsPayout(SocketModel.uIData);
+            //uIManager.UpdatePlayerInfo(SocketModel.playerData);
+            //uIManager.PopulateSymbolsPayout(SocketModel.uIData);
             wheelController.PopulateWheels(SocketModel.initGameData.features);
             Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
         }
         else
         {
-            uIManager.PopulateSymbolsPayout(SocketModel.uIData);
+            //uIManager.PopulateSymbolsPayout(SocketModel.uIData);
             wheelController.PopulateWheels(SocketModel.initGameData.features);
 
         }
@@ -383,8 +383,9 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("immediate stop" + immediateStop);
 
-        var spinData = new { data = new { currentBet = betCounter, currentLines = 1, spins = 1 }, id = "SPIN" };
-        socketController.SendData("message", spinData);
+        //var spinData = new { data = new { currentBet = betCounter, currentLines = 1, spins = 1 }, id = "SPIN" };
+        //socketController.SendData("message", spinData);
+        socketController.AccumulateResult(betCounter);
         yield return slotManager.StartSpin(turboMode: turboMode);
         yield return new WaitUntil(() => socketController.isResultdone);
 
@@ -415,7 +416,7 @@ public class GameManager : MonoBehaviour
             audioController.StopWLAaudio();
         }
 
-        uIManager.UpdatePlayerInfo(SocketModel.playerData);
+        //uIManager.UpdatePlayerInfo(SocketModel.playerData);
 
         if (SocketModel.playerData.currentWining > 0)
         {

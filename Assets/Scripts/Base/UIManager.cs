@@ -98,6 +98,43 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameButtonPanel;
     [SerializeField] private Transform freeSpinText;
 
+//     private void PopulateSymbolsPayout(Paylines paylines)
+//   {
+//     for (int i = 0; i < SymbolsText.Count; i++)
+//     {
+//       string text = null;
+//       if (paylines.symbols[i].multiplier[0] != 0)
+//       {
+//         text += "5x - " + paylines.symbols[i].multiplier[0] + "x";
+//       }
+//       if (paylines.symbols[i].multiplier[1] != 0)
+//       {
+//         text += "\n4x - " + paylines.symbols[i].multiplier[1] + "x";
+//       }
+//       if (paylines.symbols[i].multiplier[2] != 0)
+//       {
+//         text += "\n3x - " + paylines.symbols[i].multiplier[2] + "x";
+//       }
+//       if (SymbolsText[i]) SymbolsText[i].text = text;
+//     }
+
+//     for (int i = 0; i < paylines.symbols.Count; i++)
+//     {
+//       if (paylines.symbols[i].name.ToUpper() == "FREESPIN")
+//       {
+//         if (FreeSpin_Text) FreeSpin_Text.text = paylines.symbols[i].description.ToString();
+//       }
+//       if (paylines.symbols[i].name.ToUpper() == "JACKPOT")
+//       {
+//         if (Jackpot_Text) Jackpot_Text.text = paylines.symbols[i].description.ToString();
+//       }
+//       if (paylines.symbols[i].name.ToUpper() == "WILD")
+//       {
+//         if (Wild_Text) Wild_Text.text = paylines.symbols[i].description.ToString();
+//       }
+//     }
+//   }
+
     [SerializeField]
     private Button m_AwakeGameButton;
 
@@ -192,13 +229,13 @@ public class UIManager : MonoBehaviour
 
 
 
-    internal void UpdatePlayerInfo(PlayerData playerData)
-    {
-        balanceTween?.Kill();
-        playerCurrentWinning.text = playerData.currentWining.ToString("f3");
-        playerBalance.text = playerData.Balance.ToString("f3");
+    // internal void UpdatePlayerInfo(PlayerData playerData)
+    // {
+    //     balanceTween?.Kill();
+    //     playerCurrentWinning.text = playerData.currentWining.ToString("f3");
+    //     playerBalance.text = playerData.Balance.ToString("f3");
 
-    }
+    // }
 
     private IEnumerator LoadingTextAnimate()
     {
@@ -266,22 +303,23 @@ public class UIManager : MonoBehaviour
         OpenPopup(ADPopup_Object);
     }
 
-    internal void PopulateSymbolsPayout(UIData uIData)
-    {
-        string text = "";
-        // for (int i = 0; i < SymbolsText.Length; i++)
-        // {
-        //     text = "";
-        //     for (int j = 0; j < uIData.symbols[i].Multiplier.Count; j++)
-        //     {
-        //         text += $"{5 - j}x - {uIData.symbols[i].Multiplier[j][0]+"X"} \n";
-        //     }
-        //     SymbolsText[i].text = text;
-        // }
 
-        // Wild_Text.text = uIData.symbols[10].description.ToString();
-        // BonusFreeSpins_Text.text=uIData.symbols[11].description.ToString();
-    }
+    // internal void PopulateSymbolsPayout(UIData uIData)
+    // {
+    //     string text = "";
+    //     for (int i = 0; i < SymbolsText.Length; i++)
+    //     {
+    //         text = "";
+    //         for (int j = 0; j < uIData.symbols[i].Multiplier.Count; j++)
+    //         {
+    //             text += $"{5 - j}x - {uIData.symbols[i].Multiplier[j][0]+"X"} \n";
+    //         }
+    //         SymbolsText[i].text = text;
+    //     }
+
+    //     Wild_Text.text = uIData.symbols[10].description.ToString();
+    //     BonusFreeSpins_Text.text=uIData.symbols[11].description.ToString();
+    // }
 
     private void CallOnExitFunction()
     {

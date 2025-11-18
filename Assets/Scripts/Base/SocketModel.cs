@@ -14,7 +14,7 @@ public static class SocketModel
 
   public static int currentBetIndex = 0;
 
-    //   internal SocketModel()
+      // internal SocketModel()
     // {
     //   this.playerData= new PlayerData();
     //   this.uIData= new UIData();
@@ -105,6 +105,7 @@ public class PlayerData
   public double haveWon { get; set; }
   public double currentWining { get; set; }
 }
+
 
 [Serializable]
 public class AuthTokenData

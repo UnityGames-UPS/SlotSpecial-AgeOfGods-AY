@@ -10,6 +10,11 @@ using Newtonsoft.Json.Linq;
 public class SocketController : MonoBehaviour
 {
     [SerializeField] private GameObject RaycastBlocker;
+    internal GameData InitialData = null;
+  internal UiData InitUiData = null;
+  internal Root ResultData = null;
+  internal Player PlayerData = null;
+
     [SerializeField] internal bool isResultdone = false;
     private SocketManager manager;
     private Socket GameSocket;
@@ -151,7 +156,7 @@ public class SocketController : MonoBehaviour
         Debug.LogWarning("⚠️ Disconnected from server.");
         isConnected = false;
         ResetPingRoutine();
-        // UiManager.DisconnectionPopup();
+         UiManager.DisconnectionPopup();
     }
 
     private void OnError(Error err)
@@ -202,7 +207,7 @@ public class SocketController : MonoBehaviour
             {
                 if (missedPongs == 2)
                 {
-                    // UiManager.ReconnectionPopup();
+                     //UiManager.ReconnectionPopup();
                 }
                 missedPongs++;
                 Debug.LogWarning($"⚠️ Pong missed #{missedPongs}/{MaxMissedPongs}");
@@ -211,7 +216,7 @@ public class SocketController : MonoBehaviour
                 {
                     Debug.LogError("❌ Unable to connect to server — 5 consecutive pongs missed.");
                     isConnected = false;
-                    // UiManager.DisconnectionPopup();
+                     UiManager.DisconnectionPopup();
                     yield break;
                 }
             }
@@ -339,20 +344,17 @@ public class SocketController : MonoBehaviour
         message.payload.betIndex = currBet;
 
         string json = JsonUtility.ToJson(message);
-        SendData("request", json);
+        // SendData("request", message);
+        GameSocket.Emit("request", json);
     }
 
     // These properties are assumed to exist based on usage
     [SerializeField]
     private SlotController SlotManager;
     private UIManager UiManager;
-    private GameData InitialData;
-    private UiData InitUiData;
-    private Player PlayerData;
     private List<List<int>> LineData;
-     private Root ResultData;
     
-      //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+      //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(jsonObject);
         
     public class Bonus
     {
@@ -454,9 +456,9 @@ public class SocketController : MonoBehaviour
 public class Data
 {
   public int betIndex;
-  public string Event;
-  public List<int> index;
-  public int option;
+//   public string Event;
+//   public List<int> index;
+//   public int option;
 }
     [Serializable]
  public class AuthTokenData
