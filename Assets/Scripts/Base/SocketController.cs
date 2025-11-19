@@ -475,7 +475,7 @@ public class Payload
 {
   public double winAmount { get; set; }
   public List<object> lineWins { get; set; }
-  public GoldenPositions goldenPositions { get; set; }
+  public List<GoldenPositions> goldenPositions { get; set; }
   public List<object> levelUpResponse { get; set; }
   public List<object> wildPositions { get; set; }
   public int activeLines { get; set; }
