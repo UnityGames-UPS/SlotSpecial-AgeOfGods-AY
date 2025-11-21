@@ -267,19 +267,19 @@ public class SlotController : MonoBehaviour
 
     }
 
-    internal void StartIconAnimation(List<List<string>> iconPos)
-    {
-        // for (int i = 0; i < iconPos.Count; i++)
-        // {
-        //     for (int j = 0; j < iconPos[i].Count; j++)
-        //     {
+    // internal void StartIconAnimation(List<List<string>> iconPos)
+    // {
+    //     // for (int i = 0; i < iconPos.Count; i++)
+    //     // {
+    //     //     for (int j = 0; j < iconPos[i].Count; j++)
+    //     //     {
 
-        //         int[] pos = iconPos[i][j].Split(',').Select(int.Parse).ToArray();
-        //         slotMatrix[pos[0]].slotImages[pos[1]].StartAnim();
-        //     }
-        // }
+    //     //         int[] pos = iconPos[i][j].Split(',').Select(int.Parse).ToArray();
+    //     //         slotMatrix[pos[0]].slotImages[pos[1]].StartAnim();
+    //     //     }
+    //     // }
 
-    }
+    // }
 
     internal void StopIconAnimation()
     {
@@ -326,8 +326,8 @@ public class SlotController : MonoBehaviour
             delay = 0;
 
         alltweens[index].Pause();
-        slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, initialPos + 190);
-        alltweens[index] = slotTransform.DOLocalMoveY(initialPos, delay).SetEase(Ease.OutBack);
+        slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 644.690002f + 190);
+        alltweens[index] = slotTransform.DOLocalMoveY(644.690002f, delay).SetEase(Ease.OutBack);
 
     }
 

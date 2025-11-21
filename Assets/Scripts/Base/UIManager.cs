@@ -98,6 +98,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameButtonPanel;
     [SerializeField] private Transform freeSpinText;
 
+
+    [SerializeField] private SocketController socketController;
+
 //     private void PopulateSymbolsPayout(Paylines paylines)
 //   {
 //     for (int i = 0; i < SymbolsText.Count; i++)
@@ -229,13 +232,13 @@ public class UIManager : MonoBehaviour
 
 
 
-    // internal void UpdatePlayerInfo(PlayerData playerData)
-    // {
-    //     balanceTween?.Kill();
-    //     playerCurrentWinning.text = playerData.currentWining.ToString("f3");
-    //     playerBalance.text = playerData.Balance.ToString("f3");
+    internal void UpdatePlayerInfo()
+    {
+        balanceTween?.Kill();
+        //playerCurrentWinning.text = socketController.ResultData..ToString("f3");
+        playerBalance.text = socketController.PlayerData.balance.ToString("f3");
 
-    // }
+    }
 
     private IEnumerator LoadingTextAnimate()
     {

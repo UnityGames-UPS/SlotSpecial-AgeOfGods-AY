@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System;
 
 
-public static class SocketModel
+[Serializable]
+public class SocketModel
 {
   public static PlayerData playerData = new();
   public static UIData uIData = new();
@@ -39,21 +40,21 @@ public class UIData
 }
 
 
-[Serializable]
-public class BetData
-{
-  public double currentBet;
-  public double currentLines;
-  public double spins;
-  //public double TotalLines;
-}
+// [Serializable]
+// public class BetData
+// {
+//   public double currentBet;
+//   public double currentLines;
+//   public double spins;
+//   //public double TotalLines;
+// }
 
-[Serializable]
-public class AuthData
-{
-  public string GameID;
-  //public double TotalLines;
-}
+// [Serializable]
+// public class AuthData
+// {
+//   public string GameID;
+//   //public double TotalLines;
+// }
 
 [Serializable]
 public class PlayerData

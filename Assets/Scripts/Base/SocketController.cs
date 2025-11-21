@@ -284,7 +284,6 @@ public class SocketController : MonoBehaviour
         {
           InitialData = myData.gameData;
           InitUiData = myData.uiData;
-          PlayerData = myData.player;
           LineData = myData.gameData.lines;
           if (!SetInit)
           {
@@ -299,8 +298,8 @@ public class SocketController : MonoBehaviour
         }
       case "ResultData":
         {
-          SocketModel.resultGameData = myData;
-          PlayerData = myData.player;
+          ResultData = myData;
+
           isResultdone = true;
           break;
         }
@@ -350,6 +349,8 @@ public class SocketController : MonoBehaviour
   // These properties are assumed to exist based on usage
   [SerializeField]
   private SlotController SlotManager;
+
+  // private GameManager gameManager;
   private UIManager UiManager;
   private List<List<int>> LineData;
 }
@@ -459,13 +460,13 @@ public class UiData
 public class Data
 {
   public int betIndex;
-  //   public string Event;
-  //   public List<int> index;
-  //   public int option;
+  //  public string Event;
+  //    public List<int> index;
+  //    public int option;
 }
 
 
-// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+ //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
 
 public class GoldenPositions
 {
