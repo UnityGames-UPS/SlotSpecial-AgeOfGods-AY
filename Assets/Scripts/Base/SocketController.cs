@@ -13,7 +13,6 @@ public class SocketController : MonoBehaviour
   internal UiData InitUiData = null;
   internal Root ResultData = null;
   internal Player PlayerData = null;
-
   [SerializeField] internal bool isResultdone = false;
   private SocketManager manager;
   private Socket GameSocket;
@@ -267,7 +266,7 @@ public class SocketController : MonoBehaviour
     Debug.Log("Socket Closed");
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        JSManager.SendCustomMessage("OnExit");
+    JSManager.SendCustomMessage("OnExit");
 #endif
   }
 
@@ -275,7 +274,7 @@ public class SocketController : MonoBehaviour
   {
     Debug.Log(jsonObject);
     Root myData = JsonConvert.DeserializeObject<Root>(jsonObject);
-
+    PlayerData = myData.player;
     string id = myData.id;
 
     switch (id)
@@ -285,9 +284,11 @@ public class SocketController : MonoBehaviour
           InitialData = myData.gameData;
           InitUiData = myData.uiData;
           LineData = myData.gameData.lines;
+
           if (!SetInit)
           {
             PopulateSlotSocket();
+            OnInit?.Invoke();
             SetInit = true;
           }
           else
@@ -299,21 +300,7 @@ public class SocketController : MonoBehaviour
       case "ResultData":
         {
           ResultData = myData;
-
           isResultdone = true;
-          break;
-        }
-      case "ExitUser":
-        {
-          if (GameSocket != null)
-          {
-            Debug.Log("Dispose my Socket");
-            GameSocket.Disconnect();
-            manager.Close();
-          }
-#if UNITY_WEBGL && !UNITY_EDITOR
-                    JSManager.SendCustomMessage("OnExit");
-#endif
           break;
         }
     }
@@ -466,7 +453,7 @@ public class Data
 }
 
 
- //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+//Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
 
 public class GoldenPositions
 {

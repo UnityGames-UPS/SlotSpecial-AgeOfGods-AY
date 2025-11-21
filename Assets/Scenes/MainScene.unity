@@ -7200,6 +7200,7 @@ MonoBehaviour:
   freeSpinPanel: {fileID: 703049919}
   gameButtonPanel: {fileID: 1480051153}
   freeSpinText: {fileID: 915814942}
+  socketController: {fileID: 0}
   m_AwakeGameButton: {fileID: 742977646}
   playerCurrentWinning: {fileID: 576684260}
   playerBalance: {fileID: 1666685184}
@@ -9681,7 +9682,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RaycastBlocker: {fileID: 1192035551}
   isResultdone: 0
-  TestToken: d1f319418a55470fae24a0feb3db08e1
+  TestToken: eea126c5fa52402cbdcf8cc8ff50c6ac
   SlotManager: {fileID: 2046803210}
 --- !u!1001 &503428972
 PrefabInstance:
@@ -17334,6 +17335,7 @@ MonoBehaviour:
   autoSpinShowText: {fileID: 810064770}
   maxAutoSpinValue: 1000
   specialSpin: 0
+  Balance_Text: {fileID: 1666685184}
   currentTotalBet: 0
   betCounter: 0
   winIterationCount: 0

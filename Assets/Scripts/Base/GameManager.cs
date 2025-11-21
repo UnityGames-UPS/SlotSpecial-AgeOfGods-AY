@@ -130,13 +130,13 @@ public class GameManager : MonoBehaviour
 
             //uIManager.UpdatePlayerInfo(socketController.PlayerData);
             //uIManager.PopulateSymbolsPayout(SocketModel.uIData);
-            wheelController.PopulateWheels(SocketModel.initGameData.features);
+            // wheelController.PopulateWheels(SocketModel.initGameData.features);
             // Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
         }
         else
         {
             //uIManager.PopulateSymbolsPayout(SocketModel.uIData);
-            wheelController.PopulateWheels(SocketModel.initGameData.features);
+            // wheelController.PopulateWheels(SocketModel.initGameData.features);
 
         }
 
