@@ -44,9 +44,11 @@ public class WheelView : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-
-
+            string symbol = "";
             string type = values[i].type.ToUpper();
+            if (type.ToUpper() == "MULTIPLIER") symbol = "x";
+            else if (type.ToUpper() == "FREESPIN") symbol = "+";
+            else symbol = "";
 
 
             for (int j = 0; j < wheelItems.Length; j++)
@@ -54,7 +56,7 @@ public class WheelView : MonoBehaviour
                 if (type == wheelItems[j].type.ToUpper() && wheelItems[j].value == 0)
                 {
                     wheelItems[j].value = values[i].value;
-                    if (wheelItems[j].valueText) wheelItems[j].valueText.text = values[i].value.ToString();
+                    if (wheelItems[j].valueText) wheelItems[j].valueText.text = symbol + values[i].value.ToString();
                     break;
                 }
             }

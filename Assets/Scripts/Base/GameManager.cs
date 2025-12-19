@@ -310,6 +310,7 @@ public class GameManager : MonoBehaviour
             ToggleButtonGrp(true);
             yield break;
         }
+        slotManager.SetGoldenDarkActive();
         Debug.Log("hajshdfj");
         yield return OnSpin();
         Debug.Log("2222222222");
@@ -350,7 +351,7 @@ public class GameManager : MonoBehaviour
             if (freeSpinRoutine != null)
             {
                 StopCoroutine(freeSpinRoutine);
-                uIManager.FreeSpinPopup(freeSpinCount - prevFreeSpin, false);
+                if (freeSpinCount - prevFreeSpin > 0) uIManager.FreeSpinPopup(freeSpinCount - prevFreeSpin, false);
                 yield return new WaitForSeconds(2f);
                 uIManager.CloseFreeSpinPopup();
                 freeSpinRoutine = StartCoroutine(FreeSpinRoutine());
@@ -461,7 +462,7 @@ public class GameManager : MonoBehaviour
         }
         if (socketController.ResultData.payload.iswheeltrigger)
         {
-            checkForGoldenInarow(socketController.ResultData.payload.goldenPositions, socketController.ResultData.payload.wheelBonus);
+            checkForGoldenInarow(socketController.ResultData.payload.goldenPositions);
         }
         Debug.Log("----------------2");
         if (socketController.ResultData.payload.lineWins.Count > 0)
@@ -509,17 +510,12 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void checkForGoldenInarow(List<GoldenPositions> goldPositions, WheelBonus wheelBonus)
+    void checkForGoldenInarow(List<GoldenPositions> goldPositions)
     {
-        int requiredCount = wheelBonus.featureType switch
-        {
-            "small" => 3,
-            "medium" => 4,
-            _ => 5
-        };
+        // Highest priority first
+        int[] priorities = { 5, 4, 3 };
 
-        // Collect all golden positions
-        List<Vector2Int> allPositions = new List<Vector2Int>();
+        List<Vector2Int> allPositions = new();
 
         foreach (var gp in goldPositions)
         {
@@ -529,7 +525,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // Group by row
         var groupedByRow = new Dictionary<int, List<int>>();
 
         foreach (var p in allPositions)
@@ -540,34 +535,45 @@ public class GameManager : MonoBehaviour
             groupedByRow[p.x].Add(p.y);
         }
 
-        // Check each row for consecutive columns
-        foreach (var row in groupedByRow.Keys)
+        // Try 5 → 4 → 3 (MAX first)
+        foreach (int requiredCount in priorities)
         {
-            List<int> cols = groupedByRow[row];
-            cols.Sort();
-
-            List<Vector2Int> streak = new List<Vector2Int>();
-
-            for (int i = 0; i < cols.Count; i++)
+            foreach (var kvp in groupedByRow)
             {
-                if (i == 0 || cols[i] == cols[i - 1] + 1)
-                {
-                    streak.Add(new Vector2Int(row, cols[i]));
-                }
-                else
-                {
-                    streak.Clear();
-                    streak.Add(new Vector2Int(row, cols[i]));
-                }
+                int row = kvp.Key;
+                List<int> cols = kvp.Value;
+                cols.Sort();
 
-                if (streak.Count == requiredCount)
+                List<Vector2Int> streak = new();
+
+                for (int i = 0; i < cols.Count; i++)
                 {
-                    TriggerFeature(requiredCount, streak);
-                    return;
+                    if (i == 0 || cols[i] == cols[i - 1] + 1)
+                    {
+                        streak.Add(new Vector2Int(row, cols[i]));
+                    }
+                    else
+                    {
+                        streak.Clear();
+                        streak.Add(new Vector2Int(row, cols[i]));
+                    }
+
+                    if (streak.Count >= requiredCount)
+                    {
+                        // Take FIRST valid max streak and exit
+                        var finalStreak = streak.GetRange(
+                            streak.Count - requiredCount,
+                            requiredCount
+                        );
+
+                        TriggerFeature(requiredCount, finalStreak);
+                        return; // ✅ STOP EVERYTHING
+                    }
                 }
             }
         }
     }
+
     void TriggerFeature(int count, List<Vector2Int> streak)
     {
         GameObject feature = null;

@@ -513,6 +513,8 @@ public class WheelBonus
   public int featureValue;
   public double awardValue;
   public List<bool> levelUpChain;
+
+  public List<string> wheelTypeChain;
 }
 [Serializable]
 public class GoldenSymbols
