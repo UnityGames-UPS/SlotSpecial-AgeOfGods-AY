@@ -9,6 +9,7 @@ using Best.SocketIO.Events;
 public class SocketController : MonoBehaviour
 {
   [SerializeField] private GameObject RaycastBlocker;
+  [SerializeField] private UIManager UiManager;
   internal GameData InitialData = null;
   internal UiData InitUiData = null;
   internal Root ResultData = null;
@@ -122,7 +123,7 @@ public class SocketController : MonoBehaviour
 #if UNITY_EDITOR
     this.manager = new SocketManager(new Uri(TestSocketURI), options);
 #else
-        this.manager = new SocketManager(new Uri(SocketURI), options);
+    this.manager = new SocketManager(new Uri(SocketURI), options);
 #endif
 
     if (string.IsNullOrEmpty(nameSpace) || string.IsNullOrWhiteSpace(nameSpace))
@@ -353,7 +354,7 @@ public class SocketController : MonoBehaviour
   private SlotController SlotManager;
 
   // private GameManager gameManager;
-  private UIManager UiManager;
+
   private List<List<int>> LineData;
 }
 

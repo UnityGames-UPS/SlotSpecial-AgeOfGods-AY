@@ -312,6 +312,7 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log("hajshdfj");
         yield return OnSpin();
+        Debug.Log("2222222222");
         yield return OnSpinEnd();
         Debug.Log("2222222222");
         featureSpin = false;
@@ -448,6 +449,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator OnSpinEnd()
     {
+        Debug.Log("----------------1");
         audioController.StopSpinAudio();
         if (socketController.ResultData.payload.goldenPositions.Count > 0)
         {
@@ -461,6 +463,7 @@ public class GameManager : MonoBehaviour
         {
             checkForGoldenInarow(socketController.ResultData.payload.goldenPositions, socketController.ResultData.payload.wheelBonus);
         }
+        Debug.Log("----------------2");
         if (socketController.ResultData.payload.lineWins.Count > 0)
         {
             // audioController.PlayWLAudio("electric");
@@ -473,24 +476,27 @@ public class GameManager : MonoBehaviour
             }
             audioController.StopWLAaudio();
         }
+        Debug.Log("----------------3");
         slotManager.SetDarkActive(true, false);
         uIManager.UpdatePlayerInfo();
 
-        if (socketController.ResultData.payload.winAmount > 0)
-        {
+        Debug.Log("----------------4");
+        // if (socketController.ResultData.payload.winAmount > 0)
+        // {
 
-            winAnimComplete = false;
-            CheckWinPopups(socketController.ResultData.payload.winAmount);
-            yield return new WaitWhile(() => !winAnimComplete);
-            winAnimComplete = false;
-            if (winPopUpRoutine != null)
-            {
-                StopCoroutine(winPopUpRoutine);
-                winPopUpRoutine = null;
-            }
-            audioController.StopWLAaudio();
+        //     winAnimComplete = false;
+        //     CheckWinPopups(socketController.ResultData.payload.winAmount);
+        //     yield return new WaitWhile(() => !winAnimComplete);
+        //     winAnimComplete = false;
+        //     if (winPopUpRoutine != null)
+        //     {
+        //         StopCoroutine(winPopUpRoutine);
+        //         winPopUpRoutine = null;
+        //     }
+        //     audioController.StopWLAaudio();
 
-        }
+        // }
+        Debug.Log("----------------5");
         if (isFreeSpin)
             uIManager.UpdateFreeSpinInfo(winnings: socketController.ResultData.payload.winAmount);
 
@@ -498,6 +504,7 @@ public class GameManager : MonoBehaviour
         slotManager.SetWildePosOff();
         slotManager.watchAnimation.StopAnimation();
 
+        Debug.Log("----------------6");
         yield return null;
     }
 
