@@ -46,9 +46,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] internal Button Settings_Button;
     [SerializeField] private Button SettingsExit_Button;
     [SerializeField] private Button SoundToggle_button;
+    [SerializeField] private Button SoundOFFToggle_button;
     [SerializeField] private Button MusicToggle_button;
+    [SerializeField] private Button MusicOFFToggle_button;
     [SerializeField] private Sprite empty;
     [SerializeField] private Sprite button;
+    [SerializeField] private Sprite soundON;
+    [SerializeField] private Sprite soundOF;
     private bool isMusic = true;
     private bool isSound = true;
 
@@ -332,9 +336,9 @@ public class UIManager : MonoBehaviour
     private void CallOnExitFunction()
     {
         isExit = true;
-        OnExit?.Invoke();
+        // OnExit?.Invoke();
         // audioController.PlayButtonAudio();
-        // socketManager.CloseSocket();
+        StartCoroutine(socketController.CloseSocket());
     }
 
     private void OpenPopup(GameObject Popup)
@@ -535,13 +539,13 @@ public class UIManager : MonoBehaviour
         isMusic = !isMusic;
         if (isMusic)
         {
-            MusicToggle_button.image.sprite = button;
+            MusicToggle_button.image.sprite = soundOF;
 
             ToggleAudio?.Invoke(false, "bg");
         }
         else
         {
-            MusicToggle_button.image.sprite = empty;
+            MusicToggle_button.image.sprite = soundON;
             ToggleAudio?.Invoke(true, "bg");
         }
     }
@@ -551,13 +555,13 @@ public class UIManager : MonoBehaviour
         isSound = !isSound;
         if (isSound)
         {
-            SoundToggle_button.image.sprite = button;
+            SoundToggle_button.image.sprite = soundOF;
             ToggleAudio?.Invoke(false, "button");
             ToggleAudio?.Invoke(false, "wl");
         }
         else
         {
-            SoundToggle_button.image.sprite = empty;
+            SoundToggle_button.image.sprite = soundON;
             ToggleAudio?.Invoke(true, "button");
             ToggleAudio?.Invoke(true, "wl");
         }
