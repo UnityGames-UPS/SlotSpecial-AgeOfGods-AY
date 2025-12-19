@@ -12,22 +12,26 @@ public class SocketController : MonoBehaviour
   internal GameData InitialData = null;
   internal UiData InitUiData = null;
   internal Root ResultData = null;
+  internal Root InitFeature = null;
   internal Player PlayerData = null;
   [SerializeField] internal bool isResultdone = false;
   private SocketManager manager;
   private Socket GameSocket;
   protected string SocketURI = null;
   protected string TestSocketURI = "http://localhost:5000/";
-  [SerializeField] private string TestToken;
-  protected string nameSpace = "playground";
+
+  protected string nameSpace = "playground"; //BackendChanges
   internal bool SetInit = false;
   private const int maxReconnectionAttempts = 6;
   private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
   private bool isConnected = false;
   private bool hasEverConnected = false;
+  [SerializeField] internal JSFunctCalls JSManager;
   private const int MaxReconnectAttempts = 5;
   private const float ReconnectDelaySeconds = 2f;
-
+  [SerializeField]
+  private string testToken;
+  protected string gameID = "SL-AOG";
   private float lastPongTime = 0f;
   private float pingInterval = 2f;
   private bool waitingForPong = false;
@@ -44,45 +48,54 @@ public class SocketController : MonoBehaviour
   {
     SetInit = false;
     // Debug.unityLogger.logEnabled = false;
+    Application.runInBackground = true;
   }
 
   private void Start()
   {
+    //OpenWebsocket();
     OpenSocket();
   }
 
   void ReceiveAuthToken(string jsonData)
   {
     Debug.Log("Received data: " + jsonData);
+
+    // Parse the JSON data
     var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
     SocketURI = data.socketURL;
     myAuth = data.cookie;
     nameSpace = data.nameSpace;
+    // Proceed with connecting to the server using myAuth and socketURL
   }
 
-  internal void OpenSocket()
+  // string myAuth = null;
+
+  private void OpenSocket()
   {
-    SocketOptions options = new SocketOptions();
+    SocketOptions options = new SocketOptions(); //Back2 Start
     options.AutoConnect = false;
     options.Reconnection = false;
-    options.Timeout = TimeSpan.FromSeconds(3);
+    options.Timeout = TimeSpan.FromSeconds(3); //Back2 end
     options.ConnectWith = Best.SocketIO.Transports.TransportTypes.WebSocket;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        JSManager.SendCustomMessage("authToken");
-        StartCoroutine(WaitForAuthToken(options));
+            JSManager.SendCustomMessage("authToken");
+            StartCoroutine(WaitForAuthToken(options));
 #else
     Func<SocketManager, Socket, object> authFunction = (manager, socket) =>
     {
       return new
       {
-        token = TestToken
+        token = testToken
       };
     };
     options.Auth = authFunction;
+    // Proceed with connecting to the server
     SetupSocketManager(options);
 #endif
   }
+
 
   private IEnumerator WaitForAuthToken(SocketOptions options)
   {
@@ -123,7 +136,7 @@ public class SocketController : MonoBehaviour
     }
 
     GameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
-    GameSocket.On(SocketIOEventTypes.Disconnect, OnDisconnected);
+    GameSocket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
     GameSocket.On<Error>(SocketIOEventTypes.Error, OnError);
     GameSocket.On<string>("game:init", OnListenEvent);
     GameSocket.On<string>("result", OnListenEvent);
@@ -138,7 +151,7 @@ public class SocketController : MonoBehaviour
 
     if (hasEverConnected)
     {
-      // UiManager.CheckAndClosePopups();
+      UiManager.CheckAndClosePopups();
     }
 
     isConnected = true;
@@ -149,7 +162,7 @@ public class SocketController : MonoBehaviour
     SendPing();
   }
 
-  private void OnDisconnected()
+  private void OnDisconnected(string response)
   {
     Debug.LogWarning("⚠️ Disconnected from server.");
     isConnected = false;
@@ -161,7 +174,7 @@ public class SocketController : MonoBehaviour
   {
     Debug.LogError("Socket Error Message: " + err);
 #if UNITY_WEBGL && !UNITY_EDITOR
-        JSManager.SendCustomMessage("error");
+    JSManager.SendCustomMessage("error");
 #endif
   }
 
@@ -198,14 +211,14 @@ public class SocketController : MonoBehaviour
     {
       if (missedPongs == 0)
       {
-        // UiManager.CheckAndClosePopups();
+        UiManager.CheckAndClosePopups();
       }
 
       if (waitingForPong)
       {
         if (missedPongs == 2)
         {
-          //UiManager.ReconnectionPopup();
+          UiManager.ReconnectionPopup();
         }
         missedPongs++;
         Debug.LogWarning($"⚠️ Pong missed #{missedPongs}/{MaxMissedPongs}");
@@ -284,6 +297,7 @@ public class SocketController : MonoBehaviour
           InitialData = myData.gameData;
           InitUiData = myData.uiData;
           LineData = myData.gameData.lines;
+          InitFeature = myData;
 
           if (!SetInit)
           {
@@ -300,6 +314,7 @@ public class SocketController : MonoBehaviour
       case "ResultData":
         {
           ResultData = myData;
+          Debug.Log("Receved Result" + ResultData.payload.wildPositions.Count);
           isResultdone = true;
           break;
         }
@@ -345,26 +360,26 @@ public class SocketController : MonoBehaviour
 [Serializable]
 public class Bonus
 {
-  public bool enabled { get; set; }
-  public List<int> bonusCount { get; set; }
-  public List<double> wheelProb { get; set; }
-  public List<double> goldSymbolProb { get; set; }
-  public SmallWheelFeature smallWheelFeature { get; set; }
-  public MediumWheelFeature mediumWheelFeature { get; set; }
-  public LargeWheelFeature largeWheelFeature { get; set; }
+  public bool enabled;
+  public List<int> bonusCount;
+  public List<double> wheelProb;
+  public List<double> goldSymbolProb;
+  public SmallWheelFeature smallWheelFeature;
+  public MediumWheelFeature mediumWheelFeature;
+  public LargeWheelFeature largeWheelFeature;
 }
 
 [Serializable]
 public class Features
 {
-  public Bonus bonus { get; set; }
+  public Bonus bonus;
 }
 
 [Serializable]
 public class FeatureValue
 {
-  public string type { get; set; }
-  public int value { get; set; }
+  public string type;
+  public int value;
 }
 
 [Serializable]
@@ -376,71 +391,71 @@ public class MessageData
 [Serializable]
 public class GameData
 {
-  public List<List<int>> lines { get; set; }
-  public List<double> bets { get; set; }
-  public int totalLines { get; set; }
+  public List<List<int>> lines;
+  public List<double> bets;
+  public int totalLines;
 }
 
 [Serializable]
 public class LargeWheelFeature
 {
-  public List<FeatureValue> featureValues { get; set; }
-  public List<double> featureProbs { get; set; }
+  public List<FeatureValue> featureValues;
+  public List<double> featureProbs;
 }
 
 [Serializable]
 public class MediumWheelFeature
 {
-  public List<FeatureValue> featureValues { get; set; }
-  public List<double> featureProbs { get; set; }
+  public List<FeatureValue> featureValues;
+  public List<double> featureProbs;
 }
 
 [Serializable]
 public class Paylines
 {
-  public List<Symbol> symbols { get; set; }
+  public List<Symbol> symbols;
 }
 
 [Serializable]
 public class Player
 {
-  public double balance { get; set; }
+  public double balance;
 }
 
 [Serializable]
 public class Root
 {
-  public string id { get; set; }
-  public GameData gameData { get; set; }
-  public Features features { get; set; }
-  public UiData uiData { get; set; }
-  public Player player { get; set; }
-  public bool success { get; set; }
-  public List<List<string>> matrix { get; set; }
+  public string id;
+  public GameData gameData;
+  public Features features;
+  public UiData uiData;
+  public Player player;
+  public bool success;
+  public List<List<string>> matrix;
 
-  public Payload payload { get; set; }
+  public Payload payload;
 }
 
 [Serializable]
 public class SmallWheelFeature
 {
-  public List<FeatureValue> featureValues { get; set; }
-  public List<double> featureProbs { get; set; }
+  public List<FeatureValue> featureValues;
+  public List<double> featureProbs;
 }
 
 [Serializable]
 public class Symbol
 {
-  public int id { get; set; }
-  public string name { get; set; }
-  public List<int> multiplier { get; set; }
-  public string description { get; set; }
+  public int id;
+  public string name;
+  public List<int> multiplier;
+  public string description;
 }
 
 [Serializable]
 public class UiData
 {
-  public Paylines paylines { get; set; }
+  public Paylines paylines;
 }
 
 [Serializable]
@@ -454,21 +469,56 @@ public class Data
 
 
 //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
-
+[Serializable]
 public class GoldenPositions
 {
+  public int symbolId;
+  public List<List<int>> positions;
 }
-
+[Serializable]
 public class Payload
 {
-  public double winAmount { get; set; }
-  public List<object> lineWins { get; set; }
-  public List<GoldenPositions> goldenPositions { get; set; }
-  public List<object> levelUpResponse { get; set; }
-  public List<object> wildPositions { get; set; }
-  public int activeLines { get; set; }
-  public int freeSpinsRemaining { get; set; }
-  public bool isFreeSpinActive { get; set; }
-  public int wildFeaturePending { get; set; }
+  public double winAmount;
+  public List<LineWin> lineWins;
+  public List<GoldenPositions> goldenPositions;
+  public WheelBonus wheelBonus;
+  public List<bool> levelUpResponse;
+  public List<object> wildPositions;
+  public int activeLines;
+  public int freeSpinsRemaining;
+  public bool isFreeSpinActive;
+  public bool iswheeltrigger;
+  public int wildFeaturePending;
 
+
+}
+[Serializable]
+public class LineWin
+{
+  public int lineIndex;
+  public List<int> positions;
+  public List<int> pattern;
+  public string symbolId;
+  public string symbolName;
+  public double payout;
+  public int matchCount;
+}
+[Serializable]
+public class WheelBonus
+{
+  public string wheelType;
+  public GoldenSymbols goldenSymbols;
+  public string featureType;
+  public int featureValue;
+  public double awardValue;
+  public List<bool> levelUpChain;
+}
+[Serializable]
+public class GoldenSymbols
+{
+  public string symbolId;
+  public string symbolName;
+  public int row;
+  public List<int> positions;
+  public int count;
 }

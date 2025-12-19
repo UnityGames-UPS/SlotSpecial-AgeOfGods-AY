@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 public class SlotController : MonoBehaviour
 {
-
+    [SerializeField] internal AudioController audioController;
 
     [Header("Sprites")]
     [SerializeField] private Sprite[] iconImages;
@@ -24,6 +24,14 @@ public class SlotController : MonoBehaviour
     [Header("Slot Images")]
     [SerializeField] private List<SlotImage> slotMatrix;
     [SerializeField] internal GameObject disableIconsPanel;
+    [SerializeField] private List<SlotImage> allMatrix;
+    [SerializeField] internal List<WildImage> WildMatrix;
+
+    [Header("wheel bonus")]
+    [SerializeField] internal GameObject wheelPanel;
+    [SerializeField] internal WheelView smallWheel;
+    [SerializeField] internal WheelView MediumWheel;
+    [SerializeField] internal WheelView LargeWheel;
 
 
     [Header("Slots Transforms")]
@@ -67,23 +75,33 @@ public class SlotController : MonoBehaviour
         // yield return new WaitForSeconds(0.2f);
     }
 
-    internal void PopulateSLotMatrix(List<List<string>> resultData) //, List<List<int>> goldPositions
+    internal void PopulateSLotMatrix(List<List<string>> resultData, List<GoldenPositions> goldPositions) //, List<List<int>> goldPositions
     {
 
-        for (int i = 0; i <resultData.Count; i++)
+        for (int i = 0; i < resultData.Count; i++)
         {
             for (int j = 0; j < resultData[i].Count; j++)
             {
-                slotMatrix[j].slotImages[i].SetIcon(ID:int.Parse(resultData[i][j]) ,image:iconImages[int.Parse(resultData[i][j])] );
+                slotMatrix[j].slotImages[i].SetIcon(ID: int.Parse(resultData[i][j]), image: iconImages[int.Parse(resultData[i][j])]);
+                if (int.Parse(resultData[i][j]) == 10)
+                {
+                    // Debug.Log(i + "i " + j + "j ");
+                    WildMatrix[i].slotImages[j].StopAnimation();
+                    WildMatrix[i].slotImages[j].gameObject.SetActive(true);
+                    WildMatrix[i].slotImages[j].StartAnimation();
+                }
             }
         }
-        // for (int i = 0; i < goldPositions.Count; i++)
-        // {   
-        //     int id=slotMatrix[goldPositions[i][1]].slotImages[goldPositions[i][0]].id;
-        //     slotMatrix[goldPositions[i][1]].slotImages[goldPositions[i][0]].SetGoldIcon(goldIconImages[id]);
-        // }
+        for (int i = 0; i < goldPositions.Count; i++)
+        {
+            int id = goldPositions[i].symbolId;
+            for (int j = 0; j < goldPositions[i].positions.Count; j++)
+            {
+                slotMatrix[goldPositions[i].positions[j][1]].slotImages[goldPositions[i].positions[j][0]].SetGoldIcon(goldIconImages[id]);
+            }
+        }
     }
-    internal IEnumerator StopSpin(bool turboMode,Action playFallAudio)
+    internal IEnumerator StopSpin(bool turboMode, Action playFallAudio)
     {
 
         for (int i = 0; i < Slot_Transform.Length; i++)
@@ -93,7 +111,7 @@ public class SlotController : MonoBehaviour
             if (!GameManager.immediateStop)
             {
 
-            playFallAudio?.Invoke();
+                playFallAudio?.Invoke();
                 if (turboMode)
                     yield return new WaitForSeconds(0.1f);
                 else
@@ -101,7 +119,8 @@ public class SlotController : MonoBehaviour
             }
 
         }
-        if (GameManager.immediateStop){
+        if (GameManager.immediateStop)
+        {
             playFallAudio?.Invoke();
             yield return new WaitForSeconds(0.2f);
         }
@@ -109,8 +128,8 @@ public class SlotController : MonoBehaviour
         {
             for (int j = 0; j < slotMatrix[i].slotImages.Count; j++)
             {
-                if(slotMatrix[i].slotImages[j].isGold)
-                slotMatrix[i].slotImages[j].AnimateGoldIcons();
+                if (slotMatrix[i].slotImages[j].isGold)
+                    slotMatrix[i].slotImages[j].AnimateGoldIcons();
             }
         }
         yield return new WaitForSeconds(0.5f);
@@ -120,13 +139,13 @@ public class SlotController : MonoBehaviour
 
     internal void shuffleInitialMatrix()
     {
-        for (int i = 0; i < slotMatrix.Count; i++)
+        for (int i = 0; i < allMatrix.Count; i++)
         {
-            for (int j = 0; j < slotMatrix[i].slotImages.Count; j++)
+            for (int j = 0; j < allMatrix[i].slotImages.Count; j++)
             {
                 int randomIndex = UnityEngine.Random.Range(0, iconImages.Length - 1);
-                slotMatrix[i].slotImages[j].SetIcon(ID:randomIndex,image:iconImages[randomIndex]);
-                slotMatrix[i].slotImages[j].pos = (i * 10 + j);
+                allMatrix[i].slotImages[j].SetIcon(ID: randomIndex, image: iconImages[randomIndex]);
+                //  allMatrix[i].slotImages[j].pos = (i * 10 + j);
             }
         }
     }
@@ -293,7 +312,8 @@ public class SlotController : MonoBehaviour
         animatingIcons.Clear();
     }
 
-    internal void ResetAllIcons(){
+    internal void ResetAllIcons()
+    {
 
         foreach (var item in slotMatrix)
         {
@@ -342,6 +362,143 @@ public class SlotController : MonoBehaviour
 
     }
     #endregion
+    internal void AnimateLineWins(LineWin lineWins)
+    {
+        for (int i = 0; i < lineWins.positions.Count; i++)
+        {
+
+
+            slotMatrix[lineWins.positions[i]].slotImages[lineWins.pattern[i]].StartAnim();
+
+        }
+    }
+    internal void StopAnimateLineWins(LineWin lineWins)
+    {
+        for (int i = 0; i < lineWins.positions.Count; i++)
+        {
+
+
+            slotMatrix[lineWins.positions[i]].slotImages[lineWins.pattern[i]].ResetLineAnim();
+
+        }
+    }
+    internal void SetGoldenDarkActive(bool isTrue = false)
+    {
+        for (int i = 0; i < slotMatrix.Count; i++)
+        {
+            for (int j = 0; j < slotMatrix[i].slotImages.Count; j++)
+            {
+                if (slotMatrix[i].slotImages[j].isGold)
+                {
+                    slotMatrix[i].slotImages[j].Dark.SetActive(isTrue);
+                    slotMatrix[i].slotImages[j].Darkest.SetActive(isTrue);
+                }
+            }
+        }
+    }
+    internal void SetDarkActive(bool isTrue = false, bool goldAlso = true)
+    {
+        for (int i = 0; i < slotMatrix.Count; i++)
+        {
+            for (int j = 0; j < slotMatrix[i].slotImages.Count; j++)
+            {
+                if (goldAlso)
+                {
+                    slotMatrix[i].slotImages[j].Dark.SetActive(isTrue);
+                    slotMatrix[i].slotImages[j].Darkest.SetActive(isTrue);
+                }
+                else
+                {
+                    if (!slotMatrix[i].slotImages[j].isGold)
+                    {
+                        slotMatrix[i].slotImages[j].Dark.SetActive(isTrue);
+                        slotMatrix[i].slotImages[j].Darkest.SetActive(isTrue);
+                    }
+                }
+
+            }
+        }
+    }
+
+    internal void SetWildePosOff()
+    {
+        for (int i = 0; i < WildMatrix.Count; i++)
+        {
+            for (int j = 0; j < WildMatrix[i].slotImages.Count; j++)
+            {
+                WildMatrix[i].slotImages[j].StopAnimation();
+                WildMatrix[i].slotImages[j].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    internal IEnumerator PlayWheel(WheelBonus wheelBonus)
+    {
+
+        wheelPanel.SetActive(true);
+
+        WheelView activeWheel = null;
+
+
+        switch (wheelBonus.wheelType.ToLower())
+        {
+            case "small":
+                activeWheel = smallWheel;
+                smallWheel.gameObject.SetActive(true);
+                break;
+
+            case "medium":
+                activeWheel = MediumWheel;
+                MediumWheel.gameObject.SetActive(true);
+                break;
+
+            case "large":
+                activeWheel = LargeWheel;
+                LargeWheel.gameObject.SetActive(true);
+                break;
+        }
+
+        if (activeWheel == null)
+            yield break;
+        activeWheel.transform.localRotation = Quaternion.identity;
+
+        Debug.Log($"Wheel bonus----- index: {wheelBonus.featureType}" + wheelBonus.featureValue);
+        activeWheel.targetIndex = FindTargetIndex(activeWheel, wheelBonus);
+
+        //  Debug.Log($"Wheel stop index: {activeWheel.targetIndex}" + );
+
+
+        yield return new WaitForSeconds(3f);
+
+
+        yield return StartCoroutine(activeWheel.StopWheel());
+        yield return new WaitForSeconds(0.5f);
+        //  audioController.PlayWLAudio("wheel");
+
+        Debug.Log("Wheel finished");
+        yield return new WaitForSeconds(3f);
+        activeWheel.gameObject.SetActive(false);
+        wheelPanel.SetActive(false);
+
+    }
+    int FindTargetIndex(WheelView wheel, WheelBonus bonus)
+    {
+        foreach (var item in wheel.wheelItems)
+        {
+            if (item == null) continue;
+
+            if (item.type.Equals(bonus.featureType, StringComparison.OrdinalIgnoreCase)
+                && item.value == bonus.featureValue)
+            {
+                Debug.Log($"MATCH → index {item.index}");
+                return item.index; // ✅ correct
+            }
+        }
+
+        Debug.LogWarning("No matching wheel item found");
+        return 0;
+    }
+
 
 }
 
@@ -350,5 +507,9 @@ public class SlotImage
 {
     public List<SlotIconView> slotImages = new List<SlotIconView>(10);
 }
-
+[Serializable]
+public class WildImage
+{
+    public List<ImageAnimation> slotImages = new List<ImageAnimation>(10);
+}
 

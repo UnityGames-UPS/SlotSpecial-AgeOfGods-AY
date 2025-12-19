@@ -72,6 +72,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject DisconnectPopup_Object;
     [SerializeField] private Button CloseDisconnect_Button;
 
+    [Header("disconnection popup")]
+    [SerializeField] private GameObject ReconectionPopup_Object;
+    [SerializeField] private Button CloseReconnect_Button;
+
     [Header("Quit Popup")]
     [SerializeField] private GameObject QuitPopupObject;
     [SerializeField] private Button GameExit_Button;
@@ -101,42 +105,42 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private SocketController socketController;
 
-//     private void PopulateSymbolsPayout(Paylines paylines)
-//   {
-//     for (int i = 0; i < SymbolsText.Count; i++)
-//     {
-//       string text = null;
-//       if (paylines.symbols[i].multiplier[0] != 0)
-//       {
-//         text += "5x - " + paylines.symbols[i].multiplier[0] + "x";
-//       }
-//       if (paylines.symbols[i].multiplier[1] != 0)
-//       {
-//         text += "\n4x - " + paylines.symbols[i].multiplier[1] + "x";
-//       }
-//       if (paylines.symbols[i].multiplier[2] != 0)
-//       {
-//         text += "\n3x - " + paylines.symbols[i].multiplier[2] + "x";
-//       }
-//       if (SymbolsText[i]) SymbolsText[i].text = text;
-//     }
+    //     private void PopulateSymbolsPayout(Paylines paylines)
+    //   {
+    //     for (int i = 0; i < SymbolsText.Count; i++)
+    //     {
+    //       string text = null;
+    //       if (paylines.symbols[i].multiplier[0] != 0)
+    //       {
+    //         text += "5x - " + paylines.symbols[i].multiplier[0] + "x";
+    //       }
+    //       if (paylines.symbols[i].multiplier[1] != 0)
+    //       {
+    //         text += "\n4x - " + paylines.symbols[i].multiplier[1] + "x";
+    //       }
+    //       if (paylines.symbols[i].multiplier[2] != 0)
+    //       {
+    //         text += "\n3x - " + paylines.symbols[i].multiplier[2] + "x";
+    //       }
+    //       if (SymbolsText[i]) SymbolsText[i].text = text;
+    //     }
 
-//     for (int i = 0; i < paylines.symbols.Count; i++)
-//     {
-//       if (paylines.symbols[i].name.ToUpper() == "FREESPIN")
-//       {
-//         if (FreeSpin_Text) FreeSpin_Text.text = paylines.symbols[i].description.ToString();
-//       }
-//       if (paylines.symbols[i].name.ToUpper() == "JACKPOT")
-//       {
-//         if (Jackpot_Text) Jackpot_Text.text = paylines.symbols[i].description.ToString();
-//       }
-//       if (paylines.symbols[i].name.ToUpper() == "WILD")
-//       {
-//         if (Wild_Text) Wild_Text.text = paylines.symbols[i].description.ToString();
-//       }
-//     }
-//   }
+    //     for (int i = 0; i < paylines.symbols.Count; i++)
+    //     {
+    //       if (paylines.symbols[i].name.ToUpper() == "FREESPIN")
+    //       {
+    //         if (FreeSpin_Text) FreeSpin_Text.text = paylines.symbols[i].description.ToString();
+    //       }
+    //       if (paylines.symbols[i].name.ToUpper() == "JACKPOT")
+    //       {
+    //         if (Jackpot_Text) Jackpot_Text.text = paylines.symbols[i].description.ToString();
+    //       }
+    //       if (paylines.symbols[i].name.ToUpper() == "WILD")
+    //       {
+    //         if (Wild_Text) Wild_Text.text = paylines.symbols[i].description.ToString();
+    //       }
+    //     }
+    //   }
 
     [SerializeField]
     private Button m_AwakeGameButton;
@@ -197,7 +201,8 @@ public class UIManager : MonoBehaviour
         ToggleMusic();
         ToggleSound();
 
-        winPopUpExit_Button.onClick.AddListener(()=>{
+        winPopUpExit_Button.onClick.AddListener(() =>
+        {
             CloseWinPopup();
         });
     }
@@ -235,7 +240,7 @@ public class UIManager : MonoBehaviour
     internal void UpdatePlayerInfo()
     {
         balanceTween?.Kill();
-        //playerCurrentWinning.text = socketController.ResultData..ToString("f3");
+        playerCurrentWinning.text = socketController.ResultData.payload.winAmount.ToString("f3");
         playerBalance.text = socketController.PlayerData.balance.ToString("f3");
 
     }
@@ -362,31 +367,58 @@ public class UIManager : MonoBehaviour
         // paytableList[CurrentIndex].SetActive(true);
     }
 
+    private void ClosePopup(GameObject Popup)
+    {
+        // if (audioController) audioController.PlayButtonAudio();
 
+        if (Popup) Popup.SetActive(false);
+        if (!DisconnectPopup_Object.activeSelf)
+        {
+            if (MainPopup_Object) MainPopup_Object.SetActive(false);
+        }
+    }
 
     private void Slide(bool inc)
     {
-        if(inc){
+        if (inc)
+        {
             CurrentIndex++;
-             if (CurrentIndex > paytableList.Length - 1 )
-             CurrentIndex=0;
+            if (CurrentIndex > paytableList.Length - 1)
+                CurrentIndex = 0;
 
-        }else{
+        }
+        else
+        {
             CurrentIndex--;
-            if (CurrentIndex <0)
-            CurrentIndex=paytableList.Length - 1;
+            if (CurrentIndex < 0)
+                CurrentIndex = paytableList.Length - 1;
 
         }
         foreach (var item in paytableList)
         {
             item.SetActive(false);
-            
+
         }
-            paytableList[CurrentIndex].SetActive(true);
- 
+        paytableList[CurrentIndex].SetActive(true);
+
 
     }
+    internal void CheckAndClosePopups()
+    {
 
+        if (ReconectionPopup_Object.activeInHierarchy)
+        {
+            ClosePopup(ReconectionPopup_Object);
+        }
+        if (DisconnectPopup_Object.activeInHierarchy)
+        {
+            ClosePopup(DisconnectPopup_Object);
+        }
+    }
+    internal void ReconnectionPopup()
+    {
+        OpenPopup(ReconectionPopup_Object);
+    }
     internal void FreeSpinPopup(int amount, bool enableBg)
     {
         FreeSpinCount.text = amount.ToString();
@@ -402,33 +434,36 @@ public class UIManager : MonoBehaviour
         if (freeSpinBg.activeSelf)
             freeSpinBg.SetActive(false);
     }
-    internal void EnableWinPopUp(int type,double value)
+    internal void EnableWinPopUp(int type, double value)
     {
 
         OpenPopup(WinPopup_Object);
-        if (type > 0){
+        if (type > 0)
+        {
             specialWinObject.SetActive(true);
             Win_Text.gameObject.SetActive(false);
-        }
-        else{
             Win_Text.gameObject.SetActive(true);
+        }
+        else
+        {
         }
 
         switch (type)
         {
-            case 0: StartCoroutine(WinTextAnim(value,false));
+            case 0:
+                StartCoroutine(WinTextAnim(value, false));
                 break;
             case 1:
                 specialWinTitle.sprite = winTitleSprites[0];
-                StartCoroutine(WinTextAnim(value,true));
+                StartCoroutine(WinTextAnim(value, true));
                 break;
             case 2:
-                specialWinTitle.sprite = winTitleSprites[1];
-                StartCoroutine(WinTextAnim(value,true));
+                specialWinTitle.sprite = winTitleSprites[0];
+                StartCoroutine(WinTextAnim(value, true));
                 break;
             case 3:
-                specialWinTitle.sprite = winTitleSprites[2];
-                StartCoroutine(WinTextAnim(value,true));
+                specialWinTitle.sprite = winTitleSprites[0];
+                StartCoroutine(WinTextAnim(value, true));
                 break;
         }
     }
@@ -436,7 +471,7 @@ public class UIManager : MonoBehaviour
     internal void DeductBalanceAnim(double finalAmount, double initAmount)
     {
 
-        balanceTween=DOTween.To(() => initAmount, (val) => initAmount = val, finalAmount, 0.8f).OnUpdate(() =>
+        balanceTween = DOTween.To(() => initAmount, (val) => initAmount = val, finalAmount, 0.8f).OnUpdate(() =>
         {
             playerBalance.text = initAmount.ToString("f3");
 
@@ -447,33 +482,37 @@ public class UIManager : MonoBehaviour
         });
     }
 
-    internal IEnumerator WinTextAnim(double amount,bool special)
+    internal IEnumerator WinTextAnim(double amount, bool special)
     {
         Sequence sequence = DOTween.Sequence();
-        if(!special){
-        Win_Text.text = amount.ToString("f3");
-        Win_Text.transform.localScale *= 4;
-        Color InitCOlor = Win_Text.color;
-        Win_Text.color = new Color(0, 0, 0, 0);
-        sequence.Append(Win_Text.transform.DOScale(Vector2.one, 1f));
-        sequence.Join(Win_Text.DOColor(InitCOlor, 1f));
-        }else{
-            SpecialWin_Text.text=amount.ToString("f3");
+        if (!special)
+        {
+            Win_Text.text = amount.ToString("f3");
+            Win_Text.transform.localScale *= 4;
+            Color InitCOlor = Win_Text.color;
+            Win_Text.color = new Color(0, 0, 0, 0);
+            sequence.Append(Win_Text.transform.DOScale(Vector2.one, 1f));
+            sequence.Join(Win_Text.DOColor(InitCOlor, 1f));
         }
-        WintextTween=sequence;
+        else
+        {
+            SpecialWin_Text.text = amount.ToString("f3");
+        }
+        WintextTween = sequence;
         yield return new WaitForSeconds(3f);
         CloseWinPopup();
 
     }
 
-    void CloseWinPopup(){
+    void CloseWinPopup()
+    {
         ClosePopup();
         if (specialWinObject.activeSelf)
             specialWinObject.SetActive(false);
-        GameManager.winAnimComplete=true;
+        GameManager.winAnimComplete = true;
         WintextTween?.Kill();
-        Win_Text.color=new Color(1,1,1,1);
-        Win_Text.transform.localScale=Vector3.one;
+        Win_Text.color = new Color(1, 1, 1, 1);
+        Win_Text.transform.localScale = Vector3.one;
     }
     internal void DisconnectionPopup()
     {

@@ -3,7 +3,7 @@ guid: 0c4a2b0e3e21f4b7a8abaccb4e344971
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -131,7 +131,7 @@ TextureImporter:
         width: 1079
         height: 1078
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -139,6 +139,48 @@ TextureImporter:
       bones: []
       spriteID: 46c56d161ea2f465690933be8019108a
       internalID: 906703539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wheel-01_1
+      rect:
+        serializedVersion: 2
+        x: 1189
+        y: 101
+        width: 1084
+        height: 1082
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2e32f17879df4811a27088fe2f00459
+      internalID: -2063425940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wheel-01_2
+      rect:
+        serializedVersion: 2
+        x: 2346
+        y: 108
+        width: 1095
+        height: 1087
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca07158cca94f472eb688d2fde12d6eb
+      internalID: -588620165
       vertices: []
       indices: 
       edges: []
@@ -155,6 +197,8 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       wheel-01_0: 906703539
+      wheel-01_1: -2063425940
+      wheel-01_2: -588620165
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

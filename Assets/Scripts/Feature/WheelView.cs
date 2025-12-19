@@ -4,56 +4,237 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 using System;
+using System.Linq;
+using Best.HTTP.Request.Settings;
 public class WheelView : MonoBehaviour
 {
     public int segment = 24;
     Tween rotationTween;
     public int targetIndex;
-    internal int type=0;
+    internal int type = 0;
     [SerializeField] internal WheelItem[] wheelItems;
+    public bool isStatic = true;
+    [SerializeField] float startOffsetAngle = 25f;
+    [SerializeField] int extraRotations = 5;
+    bool canStopOnHit = false;
+    bool hasStopped = false;
+
     void Start()
     {
-        rotationTween ??= transform.DOLocalRotate(new Vector3(0, 0, -360), 7f, RotateMode.FastBeyond360)
-      .SetLoops(-1, LoopType.Incremental)
-      .SetEase(Ease.Linear);
-    }
-
-    void Update()
-    {
-        // if(Input.GetMouseButtonDown(0))
-        // StartCoroutine(StopWheel());
-    }
-
-    internal void PopulateValues(List<double> values){
-
-        for (int i = 2; i < wheelItems.Length; i++)
+        if (isStatic)
         {
-            wheelItems[i].value=values[i];
-            if(i<4)
-            wheelItems[i].valueText.text=wheelItems[i].value.ToString("f0");
-            else if(i<6)
-            wheelItems[i].valueText.text="+"+wheelItems[i].value.ToString("f0");
-            else
-            wheelItems[i].valueText.text="X"+wheelItems[i].value.ToString();
+            rotationTween ??= transform.DOLocalRotate(new Vector3(0, 0, -360), 7f, RotateMode.FastBeyond360)
+          .SetLoops(-1, LoopType.Incremental)
+          .SetEase(Ease.Linear);
         }
     }
-    IEnumerator StopWheel()
+
+    internal void PopulateValues(List<FeatureValue> values)
     {
-        rotationTween.Kill();
 
-        float currentAngle = transform.localEulerAngles.z % 360f;
-        float targetAngle = -targetIndex * (360f / segment);
-
-        // Ensure the rotation always goes forward (clockwise)
-        if (targetAngle < currentAngle)
+        if (wheelItems == null || values == null)
         {
-            targetAngle += -360f;
+
+            return;
         }
 
-        transform.DOLocalRotate(new Vector3(0, 0, targetAngle), 5f, RotateMode.FastBeyond360);
+        int count = values.Count;
 
-        yield return new WaitForSeconds(1f);
+
+
+        for (int i = 0; i < count; i++)
+        {
+
+
+            string type = values[i].type.ToUpper();
+
+
+            for (int j = 0; j < wheelItems.Length; j++)
+            {
+                if (type == wheelItems[j].type.ToUpper() && wheelItems[j].value == 0)
+                {
+                    wheelItems[j].value = values[i].value;
+                    if (wheelItems[j].valueText) wheelItems[j].valueText.text = values[i].value.ToString();
+                    break;
+                }
+            }
+
+
+
+        }
     }
+    public void OnSegmentHit(WheelItem hitItem)
+    {
+        if (hasStopped) return;
+
+        hasStopped = true;
+
+        transform.DOKill(true);
+
+        Debug.Log(
+            $"FINAL RESULT → index:{hitItem.index}, type:{hitItem.type}, value:{hitItem.value}"
+        );
+    }
+
+
+
+    // internal IEnumerator StopWheel()
+    // {
+    //     hasStopped = false;
+    //     canStopOnHit = false;
+
+    //     // Kill infinite spin
+    //     transform.DOKill(true);
+
+    //     // 🔒 Disable colliders (cannot stop)
+    //     SetCollidersActive(false);
+
+    //     // 🔄 Spin 2 FULL rounds
+    //     Tween twoRoundsTween = transform.DOLocalRotate(
+    //         new Vector3(0f, 0f, -360f * 2),
+    //         2.5f,
+    //         RotateMode.FastBeyond360
+    //     ).SetEase(Ease.Linear);
+
+    //     yield return twoRoundsTween.WaitForCompletion();
+
+    //     // 🔓 Enable colliders
+    //     SetCollidersActive(true);
+    //     canStopOnHit = true;
+
+    //     Debug.Log("2 rounds done — colliders enabled");
+
+    //     // 🔄 Spin ONE MORE round (free spin)
+    //     Tween finalRoundTween = transform.DOLocalRotate(
+    //         new Vector3(0f, 0f, -360f),
+    //         1.5f,
+    //         RotateMode.FastBeyond360
+    //     ).SetEase(Ease.Linear);
+
+    //     yield return finalRoundTween.WaitForCompletion();
+
+    //     Debug.Log("1 extra round completed — if not hit, will continue until hit");
+    // }
+
+    void EnableOnlyTargetCollider()
+    {
+        foreach (var item in wheelItems)
+        {
+            if (item?.collider == null) continue;
+
+            var col = item.collider.GetComponent<Collider2D>();
+            col.enabled = (item.index == targetIndex);
+        }
+
+        Debug.Log($"Collider enabled ONLY for index {targetIndex}");
+    }
+    internal IEnumerator StopWheel()
+    {
+        hasStopped = false;
+
+        // Kill infinite spin
+        transform.DOKill(true);
+
+        // 🔒 No collider can stop wheel yet
+        DisableAllColliders();
+
+        // 🔄 Spin EXACTLY 2 rounds
+        yield return transform.DOLocalRotate(
+            new Vector3(0, 0, -360f * 2),
+            2.2f,
+            RotateMode.FastBeyond360
+        ).SetEase(Ease.Linear)
+         .WaitForCompletion();
+
+        // 🎯 Enable ONLY winning collider
+        EnableOnlyTargetCollider();
+
+        // 🔄 Keep spinning until hit
+        rotationTween = transform.DOLocalRotate(
+            new Vector3(0, 0, -360),
+            1.2f,
+            RotateMode.FastBeyond360
+        ).SetLoops(-1, LoopType.Incremental)
+         .SetEase(Ease.Linear);
+
+        Debug.Log("Waiting for target collider hit...");
+    }
+
+    void DisableAllColliders()
+    {
+        foreach (var item in wheelItems)
+        {
+            if (item?.collider == null) continue;
+            item.collider.GetComponent<Collider2D>().enabled = false;
+        }
+    }
+
+
+
+    // internal IEnumerator StopWheel()
+    // {
+    //     for (int i = 0; i < wheelItems.Length; i++)
+    //     {
+    //         if (wheelItems[i] != null && wheelItems[i].valueText != null)
+    //         {
+    //             wheelItems[i].valueText.color = Color.white;
+    //         }
+    //     }
+    //     if (targetIndex >= 0 && targetIndex < wheelItems.Length)
+    //     {
+    //         if (wheelItems[targetIndex] != null && wheelItems[targetIndex].valueText != null)
+    //         {
+    //             wheelItems[targetIndex].valueText.color = Color.red;
+    //         }
+    //     }
+    //     // Kill spinning tween completely
+    //     transform.DOKill(true);
+    //     transform.localRotation = Quaternion.identity;
+    //     yield return null;
+
+    //     float anglePerSegment = 360f / 8f;     // 45°
+    //     float spriteOffset = 0; // 25°
+    //     float pointerAngle = 0f;              // TOP
+
+    //     float finalAngle =
+    //         -(360f * extraRotations)
+    //         - (targetIndex * anglePerSegment)
+    //         - (anglePerSegment * 0.5f)   // center segment
+    //         + spriteOffset
+    //         + pointerAngle;
+
+    //     Tween stopTween = transform.DOLocalRotate(
+    //         new Vector3(0f, 0f, finalAngle),
+    //         5f,
+    //         RotateMode.FastBeyond360
+    //     ).SetEase(Ease.OutQuart);
+
+    //     yield return stopTween.WaitForCompletion();
+
+    //     Debug.Log($"STOPPED → Index:{targetIndex}");
+    // }
+
+
+
+    // public void ResetWheel()
+    // {
+    //     transform.DOLocalRotate(
+    //         new Vector3(0, 0, 25),
+    //         0.3f
+    //     );
+    // }
+
 
 }
 
+[Serializable]
+public class WheelItem
+{
+
+    public string type = "";
+    public int index = 0;
+    public double value;
+    public TMP_Text valueText;
+    public GameObject collider;
+
+}

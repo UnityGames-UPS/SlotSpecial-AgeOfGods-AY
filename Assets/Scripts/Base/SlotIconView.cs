@@ -10,83 +10,77 @@ public class SlotIconView : MonoBehaviour
     [SerializeField] internal int id = -1;
     [SerializeField] internal Image iconImage;
     [SerializeField] internal Image goldenIconImage;
-    [SerializeField] internal Image bgImage;
+    [SerializeField] internal ImageAnimation bgImage;
     [SerializeField] internal Image goldenBgImage;
+    [SerializeField] internal GameObject Dark;
+    [SerializeField] internal GameObject Darkest;
     [SerializeField] internal bool isGold;
     [SerializeField] internal Image border;
     [SerializeField] internal ImageAnimation activeanimation;
 
     Tween iconAnim;
 
-    internal void SetIcon(Sprite image,int ID){
-        iconImage.sprite=image;
-        id=ID;
+    internal void SetIcon(Sprite image, int ID)
+    {
+        iconImage.sprite = image;
+        id = ID;
+        bgImage.gameObject.SetActive(true);
     }
 
-    internal void SetGoldIcon(Sprite image){
-        isGold=true;
-        goldenIconImage.sprite=image;
+    internal void SetGoldIcon(Sprite image)
+    {
+        isGold = true;
+        goldenIconImage.sprite = image;
         goldenBgImage.gameObject.SetActive(true);
         goldenIconImage.gameObject.SetActive(true);
+        Dark.SetActive(false);
+        Darkest.SetActive(false);
 
 
     }
 
-    internal void AnimateGoldIcons(){
-        goldenIconImage.DOFade(0,0.5f);
+    internal void AnimateGoldIcons()
+    {
+        goldenIconImage.DOFade(0, 0.5f);
     }
 
-    internal void Reset(){
-        isGold=false;
+    internal void Reset()
+    {
+        isGold = false;
         goldenBgImage.gameObject.SetActive(false);
         goldenIconImage.gameObject.SetActive(false);
-        goldenIconImage.color= new Color(1,1,1,1);
+        goldenIconImage.color = new Color(1, 1, 1, 1);
+        bgImage.StopAnimation();
     }
     internal void StartAnim()
     {
-        if(!isGold){
-            iconAnim=iconImage.transform.DOScale(0.7f,0.5f).SetLoops(-1,LoopType.Yoyo);
+        if (!isGold)
+        {
+            Dark.SetActive(false);
+            Darkest.SetActive(false);
             border.gameObject.SetActive(true);
+            bgImage.StartAnimation();
+
         }
-        // if(animSprite.Count==0 )
-        // {
-        //     Debug.Log("no anim sprite");
-        //     return;
-        // }
-        // activeanimation.textureArray.Clear();
-        // activeanimation.textureArray.AddRange(animSprite);
-        // activeanimation.AnimationSpeed = animSprite.Count;
-        // if(activeanimation.textureArray.Count==0)
-        //         {
-        //     Debug.Log("no anim sprite");
-        //     return;
-        // }
-        // if (id < 6 || id == 11)
-        // {
-        //     activeanimation.rendererDelegate = circleImage;
-
-        // }
-        // else if (id >= 6 && id < 8)
-        // {
-        //     activeanimation.rendererDelegate = borderImage;
-
-        // }
-        // else if (id >= 8 & id < 11)
-        // {
-        //     activeanimation.rendererDelegate = iconImage;
-
-        // }
-        // activeanimation.StartAnimation();
 
     }
-
+    internal void ResetLineAnim()
+    {
+        if (!isGold)
+        {
+            Dark.SetActive(true);
+            Darkest.SetActive(false);
+            border.gameObject.SetActive(false);
+            bgImage.StopAnimation();
+        }
+    }
     internal void StopAnim()
     {
         iconAnim?.Kill();
-        iconImage.transform.localScale=Vector3.one;
+        iconImage.transform.localScale = Vector3.one;
         border.gameObject.SetActive(false);
         // activeanimation.StopAnimation();
-
+        bgImage.StopAnimation();
         // Sprite firstSprite = activeanimation.textureArray[0];
         activeanimation.textureArray.Clear();
         // activeanimation.textureArray.Add(firstSprite);

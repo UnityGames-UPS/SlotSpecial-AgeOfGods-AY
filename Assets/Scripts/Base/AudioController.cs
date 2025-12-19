@@ -21,11 +21,12 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioClip FreeSpinBg_Audio;
     [SerializeField] private AudioClip sizeup_audio;
     [SerializeField] private AudioClip electricSound;
+    [SerializeField] private AudioClip SpinWheel;
 
 
     private void Awake()
     {
-        sidebar_sound.clip=sizeup_audio;
+        sidebar_sound.clip = sizeup_audio;
         playBgAudio();
 
         //if (bg_adudio) bg_adudio.Play();
@@ -36,11 +37,18 @@ public class AudioController : MonoBehaviour
     {
         StopWLAaudio();
         // audioPlayer_wl.loop=loop;
-        if (type == "big"){
+        if (type == "big")
+        {
             audioPlayer_wl.clip = BigWin_Audio;
-            audioPlayer_wl.pitch=1.2f;
-        } else if(type == "electric"){
-                audioPlayer_wl.clip=electricSound;
+            audioPlayer_wl.pitch = 1.2f;
+        }
+        else if (type == "electric")
+        {
+            audioPlayer_wl.clip = electricSound;
+        }
+        else if (type == "wheel")
+        {
+            audioPlayer_wl.clip = SpinWheel;
         }
         else
         {
@@ -52,7 +60,7 @@ public class AudioController : MonoBehaviour
 
     }
 
-    internal void PlaySpinStopAudio( )
+    internal void PlaySpinStopAudio()
     {
 
         audioPlayer_spin_stop.clip = SpinStopClip;
@@ -133,11 +141,12 @@ public class AudioController : MonoBehaviour
 
     }
 
-    internal void PlaySizeUpSound(bool play){
-        if(play)
-        sidebar_sound.Play();
+    internal void PlaySizeUpSound(bool play)
+    {
+        if (play)
+            sidebar_sound.Play();
         else
-        sidebar_sound.Stop();
+            sidebar_sound.Stop();
 
     }
 
