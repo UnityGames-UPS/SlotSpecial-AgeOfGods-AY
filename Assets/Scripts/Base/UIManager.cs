@@ -316,22 +316,44 @@ public class UIManager : MonoBehaviour
     }
 
 
-    // internal void PopulateSymbolsPayout(UIData uIData)
-    // {
-    //     string text = "";
-    //     for (int i = 0; i < SymbolsText.Length; i++)
-    //     {
-    //         text = "";
-    //         for (int j = 0; j < uIData.symbols[i].Multiplier.Count; j++)
-    //         {
-    //             text += $"{5 - j}x - {uIData.symbols[i].Multiplier[j][0]+"X"} \n";
-    //         }
-    //         SymbolsText[i].text = text;
-    //     }
+    internal void PopulateSymbolsPayout(UiData uiData)
+    {
+        if (uiData == null || uiData.paylines.symbols == null)
+            return;
 
-    //     Wild_Text.text = uIData.symbols[10].description.ToString();
-    //     BonusFreeSpins_Text.text=uIData.symbols[11].description.ToString();
-    // }
+        for (int i = 0; i < SymbolsText.Length && i < uiData.paylines.symbols.Count; i++)
+        {
+            Symbol symbol = uiData.paylines.symbols[i];
+
+            // Clear old text
+            SymbolsText[i].text = "";
+
+            // Skip symbols without multipliers (Wild etc.)
+            if (symbol.multiplier == null || symbol.multiplier.Count == 0)
+                continue;
+
+            int multiplierCount = symbol.multiplier.Count;
+
+            for (int j = 0; j < multiplierCount; j++)
+            {
+                // Example:
+                // 3 multipliers → 5x, 4x, 3x
+                int matchCount = multiplierCount - j + 2;
+                int payout = symbol.multiplier[j];
+
+                SymbolsText[i].text += $"{matchCount}x  -  {payout}X\n";
+            }
+        }
+
+        // Wild description (index based on your JSON)
+        if (uiData.paylines.symbols.Count > 10)
+            Wild_Text.text = uiData.paylines.symbols[10].description;
+
+        // Bonus Free Spins (if exists)
+        if (uiData.paylines.symbols.Count > 11)
+            BonusFreeSpins_Text.text = uiData.paylines.symbols[11].description;
+    }
+
 
     private void CallOnExitFunction()
     {

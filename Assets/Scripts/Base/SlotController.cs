@@ -61,18 +61,33 @@ public class SlotController : MonoBehaviour
     [SerializeField] private List<Image> levelIndicator;
     [SerializeField] internal List<SlotIconView> animatingIcons = new List<SlotIconView>();
 
+    // internal IEnumerator StartSpin(bool turboMode)
+    // {
+
+    //     for (int i = 0; i < Slot_Transform.Length; i++)
+    //     {
+    //         InitializeTweening(Slot_Transform[i], turboMode);
+    //         if (!GameManager.immediateStop)
+    //             yield return new WaitForSeconds(0.1f);
+
+    //     }
+    //     ResetAllIcons();
+    //     // yield return new WaitForSeconds(0.2f);
+    // }
     internal IEnumerator StartSpin(bool turboMode)
     {
+        // 🔥 HARD RESET before spinning
+        ResetAllIcons();
+        StopIconAnimation();
+        SetDarkActive(false, true);
 
         for (int i = 0; i < Slot_Transform.Length; i++)
         {
             InitializeTweening(Slot_Transform[i], turboMode);
+
             if (!GameManager.immediateStop)
                 yield return new WaitForSeconds(0.1f);
-
         }
-        ResetAllIcons();
-        // yield return new WaitForSeconds(0.2f);
     }
 
     internal void PopulateSLotMatrix(List<List<string>> resultData, List<GoldenPositions> goldPositions) //, List<List<int>> goldPositions
@@ -364,24 +379,49 @@ public class SlotController : MonoBehaviour
     #endregion
     internal void AnimateLineWins(LineWin lineWins)
     {
-        for (int i = 0; i < lineWins.positions.Count; i++)
+        int count = Mathf.Min(lineWins.positions.Count, lineWins.pattern.Count);
+
+        for (int i = 0; i < count; i++)
         {
+            int col = lineWins.positions[i].position[1];
+            int row = lineWins.positions[i].position[0];
 
+            // Extra safety (important)
+            if (col < 0 || col >= slotMatrix.Count) continue;
+            if (row < 0 || row >= slotMatrix[col].slotImages.Count) continue;
 
-            slotMatrix[lineWins.positions[i]].slotImages[lineWins.pattern[i]].StartAnim();
-
+            slotMatrix[col].slotImages[row].StartAnim();
         }
     }
+
     internal void StopAnimateLineWins(LineWin lineWins)
     {
-        for (int i = 0; i < lineWins.positions.Count; i++)
+        //        Debug.Log("UnityUnity");
+        int count = Mathf.Min(lineWins.positions.Count, lineWins.pattern.Count);
+
+        for (int i = 0; i < count; i++)
         {
+            int col = lineWins.positions[i].position[1];
+            int row = lineWins.positions[i].position[0];
 
+            if (col < 0 || col >= slotMatrix.Count) continue;
+            if (row < 0 || row >= slotMatrix[col].slotImages.Count) continue;
 
-            slotMatrix[lineWins.positions[i]].slotImages[lineWins.pattern[i]].ResetLineAnim();
-
+            slotMatrix[col].slotImages[row].ResetLineAnim();
         }
     }
+
+    internal void StopAnimateALLWins()
+    {
+        for (int i = 0; i < slotMatrix.Count; i++)
+        {
+            for (int j = 0; j < slotMatrix[i].slotImages.Count; j++)
+            {
+                slotMatrix[i].slotImages[j].Reset();
+            }
+        }
+    }
+
     internal void SetGoldenDarkActive(bool isTrue = false)
     {
         for (int i = 0; i < slotMatrix.Count; i++)
@@ -431,10 +471,13 @@ public class SlotController : MonoBehaviour
             }
         }
     }
-
+    internal void ResetAllAnim()
+    {
+        SetDarkActive(false, true);
+    }
     internal IEnumerator PlayWheel(WheelBonus wheelBonus)
     {
-
+        //Debug.Log("++++++++++ calling PlatyWheel");
         wheelPanel.SetActive(true);
 
         WheelView activeWheel = null;
@@ -470,6 +513,7 @@ public class SlotController : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
+        Debug.Log("++++++++++ calling stopwheel");
 
         yield return StartCoroutine(activeWheel.StopWheel());
         yield return new WaitForSeconds(0.5f);
@@ -485,11 +529,13 @@ public class SlotController : MonoBehaviour
     {
         foreach (var item in wheel.wheelItems)
         {
+
             if (item == null) continue;
 
             if (item.type.Equals(bonus.featureType, StringComparison.OrdinalIgnoreCase)
                 && item.value == bonus.featureValue)
             {
+                Debug.Log($"++++++++++ match{bonus.featureType} found{bonus.featureValue}");
                 Debug.Log($"MATCH → index {item.index}");
                 return item.index; // ✅ correct
             }

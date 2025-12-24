@@ -43,15 +43,31 @@ public class SlotIconView : MonoBehaviour
     {
         goldenIconImage.DOFade(0, 0.5f);
     }
-
     internal void Reset()
     {
+        // Kill any running tween
+        iconAnim?.Kill();
+        iconAnim = null;
+
+        // Reset gold state
         isGold = false;
         goldenBgImage.gameObject.SetActive(false);
         goldenIconImage.gameObject.SetActive(false);
-        goldenIconImage.color = new Color(1, 1, 1, 1);
+        goldenIconImage.color = Color.white;
+
+        // Reset visuals
+        border.gameObject.SetActive(false);
+        Dark.SetActive(true);
+        Darkest.SetActive(false);
+
+        // Stop animations safely
         bgImage.StopAnimation();
+        activeanimation.StopAnimation();
+
+        // Reset transform
+        iconImage.transform.localScale = Vector3.one;
     }
+
     internal void StartAnim()
     {
         if (!isGold)
@@ -79,13 +95,9 @@ public class SlotIconView : MonoBehaviour
         iconAnim?.Kill();
         iconImage.transform.localScale = Vector3.one;
         border.gameObject.SetActive(false);
-        // activeanimation.StopAnimation();
         bgImage.StopAnimation();
-        // Sprite firstSprite = activeanimation.textureArray[0];
-        activeanimation.textureArray.Clear();
-        // activeanimation.textureArray.Add(firstSprite);
-
-
+        activeanimation.StopAnimation();
     }
+
 
 }

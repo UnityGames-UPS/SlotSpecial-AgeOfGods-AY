@@ -497,12 +497,13 @@ public class Payload
 public class LineWin
 {
   public int lineIndex;
-  public List<int> positions;
+  public List<Position> positions;
   public List<int> pattern;
   public string symbolId;
   public string symbolName;
   public double payout;
   public int matchCount;
+
 }
 [Serializable]
 public class WheelBonus
@@ -524,4 +525,8 @@ public class GoldenSymbols
   public int row;
   public List<int> positions;
   public int count;
+}
+public class Position
+{
+  public List<int> position { get; set; }
 }

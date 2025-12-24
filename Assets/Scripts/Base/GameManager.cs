@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviour
     private Coroutine winPopUpRoutine;
     bool featureSpin;
     private int autoSpinLeft;
+    private Coroutine lineAnimCoroutine;
+
     void Start()
     {
 
@@ -139,12 +141,13 @@ public class GameManager : MonoBehaviour
                 uIManager.LowBalPopup();
 
             //uIManager.UpdatePlayerInfo(socketController.PlayerData);
-            //uIManager.PopulateSymbolsPayout(SocketModel.uIData);
+            uIManager.PopulateSymbolsPayout(socketController.InitUiData);
             //  wheelController.PopulateWheels(SocketModel.initGameData.features);
             // Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
         }
         else
         {
+            uIManager.PopulateSymbolsPayout(socketController.InitUiData);
             //uIManager.PopulateSymbolsPayout(SocketModel.uIData);
             // wheelController.PopulateWheels(SocketModel.initGameData.features);
 
@@ -255,18 +258,26 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator AutoSpinRoutine()
     {
-        while (isAutoSpin)
+        while (isAutoSpin && !isFreeSpin)
         {
             autoSpinText.text = autoSpinLeft.ToString();
 
             yield return SpinRoutine();
-            yield return new WaitForSeconds(0.5f);
 
+            if (isFreeSpin)
+                yield break;
+
+            yield return new WaitForSeconds(0.5f);
         }
+
+        // CLEAN EXIT (NO coroutine calls)
         autoSpinText.transform.gameObject.SetActive(false);
         isSpinning = false;
-        StartCoroutine(StopAutoSpinCoroutine());
-        yield return null;
+
+        AutoSpin_Button.gameObject.SetActive(true);
+        AutoSpinStop_Button.gameObject.SetActive(false);
+        autoSpinLeft = 0;
+        autoSpinText.text = "0";
     }
 
     private IEnumerator StopAutoSpinCoroutine(bool hard = false)
@@ -316,6 +327,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("2222222222");
         yield return OnSpinEnd();
         Debug.Log("2222222222");
+        Debug.Log("++++++++++++++++++++++++++++ calling PlatyWheel");
         featureSpin = false;
         if (socketController.ResultData.payload.iswheeltrigger)
         {
@@ -323,6 +335,7 @@ public class GameManager : MonoBehaviour
             ThreeinaRow.SetActive(false);
             fourinaRow.SetActive(false);
             fiveinaRow.SetActive(false);
+            Debug.Log("++++++++++ calling PlatyWheel");
             yield return StartCoroutine(slotManager.PlayWheel(socketController.ResultData.payload.wheelBonus));
             if (socketController.ResultData.payload.wheelBonus.featureType == "freeSpin")
             {
@@ -332,21 +345,37 @@ public class GameManager : MonoBehaviour
         Debug.Log("33333333");
         if (socketController.ResultData.payload.isFreeSpinActive || featureSpin)
         {
+            Debug.Log("freespin5555");
+
             int prevFreeSpin = freeSpinCount;
             freeSpinCount = socketController.ResultData.payload.freeSpinsRemaining;
             uIManager.UpdateFreeSpinInfo(freeSpinCount);
             isFreeSpin = true;
+            // if (autoSpinRoutine != null)
+            // {
+            //     isAutoSpin = false;
+            //     if (autoSpinRoutine != null)
+            //     {
+            //         StopCoroutine(autoSpinRoutine);
+            //         autoSpinRoutine = null;
+            //         autoSpinText.text = "0";
+            //     }
+            //     yield return StopAutoSpinCoroutine(true);
+            // }
+            // 🔴 STOP AUTOSPIN IMMEDIATELY (NO COROUTINE)
+            isAutoSpin = false;
+
             if (autoSpinRoutine != null)
             {
-                isAutoSpin = false;
-                if (autoSpinRoutine != null)
-                {
-                    StopCoroutine(autoSpinRoutine);
-                    autoSpinRoutine = null;
-                    autoSpinText.text = "0";
-                }
-                yield return StopAutoSpinCoroutine(true);
+                StopCoroutine(autoSpinRoutine);
+                autoSpinRoutine = null;
             }
+
+            autoSpinText.text = "0";
+            AutoSpin_Button.gameObject.SetActive(true);
+            AutoSpinStop_Button.gameObject.SetActive(false);
+
+            Debug.Log("freespin666666");
 
             if (freeSpinRoutine != null)
             {
@@ -367,9 +396,11 @@ public class GameManager : MonoBehaviour
 
 
             }
+            Debug.Log("freespin7777777");
 
             yield break;
         }
+        Debug.Log("44444444");
 
         if (!isAutoSpin && !isFreeSpin)
         {
@@ -394,6 +425,10 @@ public class GameManager : MonoBehaviour
     }
     bool OnSpinStart()
     {
+        slotManager.StopIconAnimation();
+        slotManager.StopAnimateALLWins();
+        slotManager.SetWildePosOff();
+        // slotManager.watchAnimation.StopAnimation();
         slotManager.watchAnimation.StopAnimation();
         isSpinning = true;
         winIterationCount = 0;
@@ -465,15 +500,21 @@ public class GameManager : MonoBehaviour
             checkForGoldenInarow(socketController.ResultData.payload.goldenPositions);
         }
         Debug.Log("----------------2");
+        if (!isFreeSpin && !isAutoSpin && !socketController.ResultData.payload.iswheeltrigger)
+        {
+            StopSpin_Button.interactable = false;
+            SlotStart_Button.interactable = true;
+        }
         if (socketController.ResultData.payload.lineWins.Count > 0)
         {
             // audioController.PlayWLAudio("electric");
             for (int i = 0; i < socketController.ResultData.payload.lineWins.Count; i++)
             {
-
-                slotManager.AnimateLineWins(socketController.ResultData.payload.lineWins[i]);
+                LineWin lineWins = socketController.ResultData.payload.lineWins[i];
+                slotManager.AnimateLineWins(lineWins);
                 yield return new WaitForSeconds(0.5f);
-                slotManager.StopAnimateLineWins(socketController.ResultData.payload.lineWins[i]);
+                //   Debug.Log(i);
+                slotManager.StopAnimateLineWins(lineWins);
             }
             audioController.StopWLAaudio();
         }
@@ -586,12 +627,29 @@ public class GameManager : MonoBehaviour
 
         feature.SetActive(true);
 
-        // Move to center of streak
-        Vector2Int centerPos = streak[streak.Count / 2];
+        Vector3 finalPosition;
 
-        Transform slotTransform = GetSlotTransform(centerPos.x, centerPos.y);
-        feature.transform.position = slotTransform.position;
+        if (count % 2 == 1) // 3 or 5
+        {
+            // Exact center
+            Vector2Int centerPos = streak[count / 2];
+            finalPosition = GetSlotTransform(centerPos.x, centerPos.y).position;
+        }
+        else // 4 in a row
+        {
+            // Between middle two slots
+            Vector2Int leftCenter = streak[(count / 2) - 1];
+            Vector2Int rightCenter = streak[count / 2];
+
+            Transform leftT = GetSlotTransform(leftCenter.x, leftCenter.y);
+            Transform rightT = GetSlotTransform(rightCenter.x, rightCenter.y);
+
+            finalPosition = (leftT.position + rightT.position) / 2f;
+        }
+
+        feature.transform.position = finalPosition;
     }
+
     Transform GetSlotTransform(int row, int col)
     {
         return slotManager.WildMatrix[row].slotImages[col].transform;
