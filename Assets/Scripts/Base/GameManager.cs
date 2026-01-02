@@ -343,7 +343,7 @@ public class GameManager : MonoBehaviour
             }
         }
         Debug.Log("33333333");
-        if (socketController.ResultData.payload.isFreeSpinActive || featureSpin)
+        if (socketController.ResultData.payload.isfreespintriggered || featureSpin)
         {
             Debug.Log("freespin5555");
 
@@ -485,7 +485,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator OnSpinEnd()
     {
-        Debug.Log("----------------1");
+        //  Debug.Log("----------------1");
         audioController.StopSpinAudio();
         if (socketController.ResultData.payload.goldenPositions.Count > 0)
         {
@@ -499,7 +499,7 @@ public class GameManager : MonoBehaviour
         {
             checkForGoldenInarow(socketController.ResultData.payload.goldenPositions);
         }
-        Debug.Log("----------------2");
+        //  Debug.Log("----------------2");
         if (!isFreeSpin && !isAutoSpin && !socketController.ResultData.payload.iswheeltrigger)
         {
             StopSpin_Button.interactable = false;
@@ -518,11 +518,11 @@ public class GameManager : MonoBehaviour
             }
             audioController.StopWLAaudio();
         }
-        Debug.Log("----------------3");
+        //  Debug.Log("----------------3");
         slotManager.SetDarkActive(true, false);
         uIManager.UpdatePlayerInfo();
 
-        Debug.Log("----------------4");
+        //  Debug.Log("----------------4");
         // if (socketController.ResultData.payload.winAmount > 0)
         // {
 
@@ -538,7 +538,7 @@ public class GameManager : MonoBehaviour
         //     audioController.StopWLAaudio();
 
         // }
-        Debug.Log("----------------5");
+        //  Debug.Log("----------------5");
         if (isFreeSpin)
             uIManager.UpdateFreeSpinInfo(winnings: socketController.ResultData.payload.winAmount);
 
@@ -546,7 +546,7 @@ public class GameManager : MonoBehaviour
         slotManager.SetWildePosOff();
         slotManager.watchAnimation.StopAnimation();
 
-        Debug.Log("----------------6");
+        // Debug.Log("----------------6");
         yield return null;
     }
 

@@ -490,6 +490,7 @@ public class Payload
   public bool isFreeSpinActive;
   public bool iswheeltrigger;
   public int wildFeaturePending;
+  public bool isfreespintriggered;
 
 
 }

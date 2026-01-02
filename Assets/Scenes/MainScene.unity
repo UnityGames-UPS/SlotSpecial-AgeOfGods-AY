@@ -13078,7 +13078,7 @@ MonoBehaviour:
   UiManager: {fileID: 377874625}
   isResultdone: 0
   JSManager: {fileID: 500036493}
-  testToken: cd13b83ae0c74b8b87a6779160f6d19c
+  testToken: 0259175180b248868940001e4e1d6ca5
   SlotManager: {fileID: 2046803210}
 --- !u!114 &500036493
 MonoBehaviour:
@@ -56138,10 +56138,10 @@ MonoBehaviour:
   SmallWin_Audio: {fileID: 8300000, guid: cdfce5526b56e4c6e91c62665662a654, type: 3}
   BigWin_Audio: {fileID: 8300000, guid: e1e2f6348d609407287bc3286591b7bf, type: 3}
   NormalBg_Audio: {fileID: 8300000, guid: 7e8d38a647243451f89d7980703b7fc7, type: 3}
-  FreeSpinBg_Audio: {fileID: 8300000, guid: 483d112211e654c2aa4cb5742d292126, type: 3}
+  FreeSpinBg_Audio: {fileID: 8300000, guid: fe913e16e78284fa096abc333db5cada, type: 3}
   sizeup_audio: {fileID: 8300000, guid: 52bf78399234240b5883575eb667f565, type: 3}
   electricSound: {fileID: 8300000, guid: 5729bded92dd445d1901dfbc7e7bc0e2, type: 3}
-  SpinWheel: {fileID: 0}
+  SpinWheel: {fileID: 8300000, guid: 6015d58fde6aa460cb8d144f74b22c1a, type: 3}
 --- !u!82 &6082600246224243600
 AudioSource:
   m_ObjectHideFlags: 0

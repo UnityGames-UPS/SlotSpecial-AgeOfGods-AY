@@ -504,6 +504,7 @@ public class SlotController : MonoBehaviour
         if (activeWheel == null)
             yield break;
         activeWheel.transform.localRotation = Quaternion.identity;
+        audioController.PlayWLAudio("wheel");
 
         Debug.Log($"Wheel bonus----- index: {wheelBonus.featureType}" + wheelBonus.featureValue);
         activeWheel.targetIndex = FindTargetIndex(activeWheel, wheelBonus);
@@ -517,7 +518,6 @@ public class SlotController : MonoBehaviour
 
         yield return StartCoroutine(activeWheel.StopWheel());
         yield return new WaitForSeconds(0.5f);
-        //  audioController.PlayWLAudio("wheel");
 
         Debug.Log("Wheel finished");
         yield return new WaitForSeconds(3f);
