@@ -77,6 +77,8 @@ public class GameManager : MonoBehaviour
     bool featureSpin;
     private int autoSpinLeft;
     private Coroutine lineAnimCoroutine;
+    private Coroutine spinRoutine;
+
 
     void Start()
     {
@@ -185,7 +187,12 @@ public class GameManager : MonoBehaviour
 
     //}
 
-    void ExecuteSpin() => StartCoroutine(SpinRoutine());
+    void ExecuteSpin()
+    {
+        if (spinRoutine != null) return;
+        spinRoutine = StartCoroutine(SpinRoutine());
+    }
+
 
 
     void ExecuteAutoSpin()
@@ -309,40 +316,56 @@ public class GameManager : MonoBehaviour
     IEnumerator SpinRoutine()
     {
         bool start = OnSpinStart();
+
+        // ===== CASE 1: Spin did not start (low balance etc.)
         if (!start)
         {
-
+            spinRoutine = null;          // ✅ ADD THIS
             isSpinning = false;
+
             if (isAutoSpin)
             {
                 StartCoroutine(StopAutoSpinCoroutine());
             }
 
             ToggleButtonGrp(true);
-            yield break;
+            yield break;                 // ← OK now
         }
+
         slotManager.SetGoldenDarkActive();
         Debug.Log("hajshdfj");
+
         yield return OnSpin();
         Debug.Log("2222222222");
+
         yield return OnSpinEnd();
         Debug.Log("2222222222");
+
         Debug.Log("++++++++++++++++++++++++++++ calling PlatyWheel");
         featureSpin = false;
+
+        // ===== WHEEL PART (no yield break here, so no change needed)
         if (socketController.ResultData.payload.iswheeltrigger)
         {
             yield return new WaitForSeconds(3f);
             ThreeinaRow.SetActive(false);
             fourinaRow.SetActive(false);
             fiveinaRow.SetActive(false);
+
             Debug.Log("++++++++++ calling PlatyWheel");
-            yield return StartCoroutine(slotManager.PlayWheel(socketController.ResultData.payload.wheelBonus));
+            yield return StartCoroutine(
+                slotManager.PlayWheel(socketController.ResultData.payload.wheelBonus)
+            );
+
             if (socketController.ResultData.payload.wheelBonus.featureType == "freeSpin")
             {
                 featureSpin = true;
             }
         }
+
         Debug.Log("33333333");
+
+        // ===== CASE 2: Free spin triggered
         if (socketController.ResultData.payload.isfreespintriggered || featureSpin)
         {
             Debug.Log("freespin5555");
@@ -351,18 +374,7 @@ public class GameManager : MonoBehaviour
             freeSpinCount = socketController.ResultData.payload.freeSpinsRemaining;
             uIManager.UpdateFreeSpinInfo(freeSpinCount);
             isFreeSpin = true;
-            // if (autoSpinRoutine != null)
-            // {
-            //     isAutoSpin = false;
-            //     if (autoSpinRoutine != null)
-            //     {
-            //         StopCoroutine(autoSpinRoutine);
-            //         autoSpinRoutine = null;
-            //         autoSpinText.text = "0";
-            //     }
-            //     yield return StopAutoSpinCoroutine(true);
-            // }
-            // 🔴 STOP AUTOSPIN IMMEDIATELY (NO COROUTINE)
+
             isAutoSpin = false;
 
             if (autoSpinRoutine != null)
@@ -380,36 +392,43 @@ public class GameManager : MonoBehaviour
             if (freeSpinRoutine != null)
             {
                 StopCoroutine(freeSpinRoutine);
-                if (freeSpinCount - prevFreeSpin > 0) uIManager.FreeSpinPopup(freeSpinCount - prevFreeSpin, false);
+
+                if (freeSpinCount - prevFreeSpin > 0)
+                    uIManager.FreeSpinPopup(freeSpinCount - prevFreeSpin, false);
+
                 yield return new WaitForSeconds(2f);
                 uIManager.CloseFreeSpinPopup();
                 freeSpinRoutine = StartCoroutine(FreeSpinRoutine());
             }
             else
             {
-
                 uIManager.FreeSpinPopup(freeSpinCount, true);
                 audioController.playBgAudio("FP");
                 yield return new WaitForSeconds(2f);
                 uIManager.CloseFreeSpinPopup();
                 freeSpinRoutine = StartCoroutine(FreeSpinRoutine());
-
-
             }
+
             Debug.Log("freespin7777777");
 
-            yield break;
+            spinRoutine = null;      // ✅ ADD THIS
+            isSpinning = false;      // ✅ ADD THIS
+            yield break;             // ← OK now
         }
+
         Debug.Log("44444444");
 
+        // ===== NORMAL SPIN END
         if (!isAutoSpin && !isFreeSpin)
         {
             isSpinning = false;
-            ToggleButtonGrp(true);
         }
 
-
+        // ===== FINAL CLEANUP (VERY IMPORTANT)
+        spinRoutine = null;          // ✅ ADD THIS
+        ToggleButtonGrp(true);
     }
+
 
     IEnumerator StopSpin()
     {
