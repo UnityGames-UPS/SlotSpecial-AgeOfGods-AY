@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
     private double currentBalance;
     [SerializeField] internal TMP_Text Balance_Text;
     [SerializeField] private double currentTotalBet;
-    [SerializeField] private int betCounter = 0;
+    [SerializeField] internal int betCounter = 0;
 
 
     private Coroutine autoSpinRoutine;
@@ -708,10 +708,11 @@ public class GameManager : MonoBehaviour
 
         }
 
-        currentTotalBet = socketController.InitialData.bets[betCounter];
+        currentTotalBet = socketController.InitialData.bets[betCounter] * socketController.InitialData.lines.Count;
         if (totalBet_text) totalBet_text.text = currentTotalBet.ToString();
         // if (currentBalance < currentTotalBet)
         //     uIManager.LowBalPopup();
+        uIManager.PopulateSymbolsPayout(socketController.InitUiData);
     }
 
     private void OnAutoSpinChange(bool inc)

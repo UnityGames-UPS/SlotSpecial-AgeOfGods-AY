@@ -6,6 +6,8 @@ using TMPro;
 using System;
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] private SocketController socketController;
+    [SerializeField] private GameManager gameManager;
 
     [Header("AutoSpin Popup")]
     [SerializeField] private Button AutoSpinButton;
@@ -107,7 +109,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Transform freeSpinText;
 
 
-    [SerializeField] private SocketController socketController;
 
     //     private void PopulateSymbolsPayout(Paylines paylines)
     //   {
@@ -339,9 +340,9 @@ public class UIManager : MonoBehaviour
                 // Example:
                 // 3 multipliers → 5x, 4x, 3x
                 int matchCount = multiplierCount - j + 2;
-                int payout = symbol.multiplier[j];
+                double payout = symbol.multiplier[j] * socketController.InitialData.bets[gameManager.betCounter];
 
-                SymbolsText[i].text += $"{matchCount}x  -  {payout}X\n";
+                SymbolsText[i].text += $"{matchCount}  -  {payout}\n";
             }
         }
 

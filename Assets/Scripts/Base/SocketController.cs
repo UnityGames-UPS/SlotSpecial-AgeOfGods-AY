@@ -19,7 +19,7 @@ public class SocketController : MonoBehaviour
   private SocketManager manager;
   private Socket GameSocket;
   protected string SocketURI = null;
-  protected string TestSocketURI = "http://localhost:5000/";
+  protected string TestSocketURI = "https://devrealtime.dingdinghouse.com/";
 
   protected string nameSpace = "playground"; //BackendChanges
   internal bool SetInit = false;
