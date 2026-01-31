@@ -22,6 +22,7 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioClip sizeup_audio;
     [SerializeField] private AudioClip electricSound;
     [SerializeField] private AudioClip SpinWheel;
+    [SerializeField] private AudioClip WinAudio;
 
 
     private void Awake()
@@ -49,6 +50,10 @@ public class AudioController : MonoBehaviour
         else if (type == "wheel")
         {
             audioPlayer_wl.clip = SpinWheel;
+        }
+        else if (type == "win")
+        {
+            audioPlayer_wl.clip = WinAudio;
         }
         else
         {

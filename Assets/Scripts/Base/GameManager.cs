@@ -422,11 +422,11 @@ public class GameManager : MonoBehaviour
         if (!isAutoSpin && !isFreeSpin)
         {
             isSpinning = false;
+            ToggleButtonGrp(true);
         }
 
         // ===== FINAL CLEANUP (VERY IMPORTANT)
         spinRoutine = null;          // ✅ ADD THIS
-        ToggleButtonGrp(true);
     }
 
 
@@ -526,6 +526,7 @@ public class GameManager : MonoBehaviour
         }
         if (socketController.ResultData.payload.lineWins.Count > 0)
         {
+            audioController.PlayWLAudio("win");
             // audioController.PlayWLAudio("electric");
             for (int i = 0; i < socketController.ResultData.payload.lineWins.Count; i++)
             {
@@ -541,23 +542,7 @@ public class GameManager : MonoBehaviour
         slotManager.SetDarkActive(true, false);
         uIManager.UpdatePlayerInfo();
 
-        //  Debug.Log("----------------4");
-        // if (socketController.ResultData.payload.winAmount > 0)
-        // {
 
-        //     winAnimComplete = false;
-        //     CheckWinPopups(socketController.ResultData.payload.winAmount);
-        //     yield return new WaitWhile(() => !winAnimComplete);
-        //     winAnimComplete = false;
-        //     if (winPopUpRoutine != null)
-        //     {
-        //         StopCoroutine(winPopUpRoutine);
-        //         winPopUpRoutine = null;
-        //     }
-        //     audioController.StopWLAaudio();
-
-        // }
-        //  Debug.Log("----------------5");
         if (isFreeSpin)
             uIManager.UpdateFreeSpinInfo(winnings: socketController.ResultData.payload.winAmount);
 
@@ -681,7 +666,7 @@ public class GameManager : MonoBehaviour
         if (AutoSpinPopup_Button) AutoSpinPopup_Button.interactable = toggle;
         if (ToatlBetMinus_Button) ToatlBetMinus_Button.interactable = toggle;
         if (TotalBetPlus_Button) TotalBetPlus_Button.interactable = toggle;
-        uIManager.Settings_Button.interactable = toggle;
+        // uIManager.Settings_Button.interactable = toggle;
     }
 
     private void OnBetChange(bool inc)
