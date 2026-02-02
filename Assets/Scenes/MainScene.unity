@@ -13079,7 +13079,7 @@ MonoBehaviour:
   UiManager: {fileID: 377874625}
   isResultdone: 0
   JSManager: {fileID: 500036493}
-  testToken: 337a44d55a6742bea2dccad080950f0b
+  testToken: c16af327e2c5477b8b38f8271b6a6621
   SlotManager: {fileID: 2046803210}
 --- !u!114 &500036493
 MonoBehaviour:

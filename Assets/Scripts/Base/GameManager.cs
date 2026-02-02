@@ -189,7 +189,15 @@ public class GameManager : MonoBehaviour
 
     void ExecuteSpin()
     {
-        if (spinRoutine != null) return;
+        //if (spinRoutine != null) return;
+
+        if (spinRoutine != null)
+        {
+
+            StopCoroutine(spinRoutine);
+            spinRoutine = null;
+        }
+        ;
         spinRoutine = StartCoroutine(SpinRoutine());
     }
 
@@ -447,7 +455,7 @@ public class GameManager : MonoBehaviour
         slotManager.StopIconAnimation();
         slotManager.StopAnimateALLWins();
         slotManager.SetWildePosOff();
-        // slotManager.watchAnimation.StopAnimation();
+
         slotManager.watchAnimation.StopAnimation();
         isSpinning = true;
         winIterationCount = 0;
