@@ -486,7 +486,7 @@ public class GameManager : MonoBehaviour
             immediateStop = false;
 
         Debug.Log("immediate stop" + immediateStop);
-
+        uIManager.ResetWin();
         yield return slotManager.StartSpin(turboMode: turboMode);
         //var spinData = new { data = new { currentBet = betCounter, currentLines = 1, spins = 1 }, id = "SPIN" };
         //socketController.SendData("message", spinData);
@@ -532,6 +532,7 @@ public class GameManager : MonoBehaviour
             StopSpin_Button.interactable = false;
             SlotStart_Button.interactable = true;
         }
+        uIManager.UpdatePlayerInfo();
         if (socketController.ResultData.payload.lineWins.Count > 0)
         {
             audioController.PlayWLAudio("win");
@@ -548,7 +549,6 @@ public class GameManager : MonoBehaviour
         }
         //  Debug.Log("----------------3");
         slotManager.SetDarkActive(true, false);
-        uIManager.UpdatePlayerInfo();
 
 
         if (isFreeSpin)

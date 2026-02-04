@@ -249,6 +249,13 @@ public class UIManager : MonoBehaviour
         playerBalance.text = socketController.PlayerData.balance.ToString("f3");
 
     }
+    internal void ResetWin()
+    {
+
+        playerCurrentWinning.text = "0.000";
+
+
+    }
 
     private IEnumerator LoadingTextAnimate()
     {
