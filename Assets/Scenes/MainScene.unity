@@ -10397,7 +10397,7 @@ MonoBehaviour:
   SpecialWin_Text: {fileID: 1616255243}
   winPopUpExit_Button: {fileID: 535492216}
   LowBalancePopup_Object: {fileID: 379363302}
-  Close_Button: {fileID: 0}
+  Close_Button: {fileID: 373443917}
   DisconnectPopup_Object: {fileID: 1808776917}
   CloseDisconnect_Button: {fileID: 657710938}
   ReconectionPopup_Object: {fileID: 124227905}
